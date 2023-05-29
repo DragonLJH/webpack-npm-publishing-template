@@ -4,8 +4,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
-    mode: "development",
-    entry: path.join(__dirname, "../src/index.js"),
+    mode: "production",
+    entry: path.join(__dirname, "../src/components/index.js"),
     devtool: 'inline-source-map',
     plugins: [
         new HtmlWebpackPlugin({
@@ -25,14 +25,11 @@ module.exports = {
         }]
     },
     output: {
-        filename: "js/bundle.js",
-        path: path.resolve(__dirname, "../dist"),
+        path: path.join(__dirname, "../lib/"),
+        filename: "index.js",
+        library: "index",
+        libraryTarget: 'umd', // 采用通用模块定义
+        libraryExport: 'default', // 兼容 ES6 的模块系统、CommonJS 和 AMD 模块规范
         clean: true,
-    },
-    devServer: {
-        compress: true,
-        host: '127.0.0.1', // webpack-dev-server启动时要指定ip，不能直接通过localhost启动，不指定会报错
-        port: 3001, // 启动端口为 3001 的服务
-        open: false // 自动打开浏览器
     },
 }
