@@ -18,6 +18,7 @@ const props = defineProps({
     targetIndex: { type: Number }
 })
 const emit = defineEmits(["controldown", "closeItem"])
+console.log("targetIndex",props.targetIndex)
 </script>
 <style scoped>
 .control {
@@ -25,14 +26,16 @@ const emit = defineEmits(["controldown", "closeItem"])
     outline: solid 1px #000;
 }
 
-.control.active .drop,
-.control.active .close {
+.control.active> .drop,
+.control.active> .close {
     display: block;
 }
 
 .main {
+    display: inline-block;
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 
 .drop {
@@ -82,7 +85,7 @@ const emit = defineEmits(["controldown", "closeItem"])
     display: flex;
     justify-content: flex-end;
     align-items: flex-start;
-    background: linear-gradient(to right top, #fff 50%, rgba(0, 0, 0, 0.3) 50%);
+    background: linear-gradient(to right top, rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.3) 50%);
     color: #fff;
 }
 </style>

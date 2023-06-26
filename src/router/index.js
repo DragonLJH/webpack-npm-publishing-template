@@ -3,15 +3,28 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 // 1. 定义路由组件.
 // 也可以从其他文件导入
 const Home = { template: '<div>Home</div>' }
-const About = { template: '<div>About</div>' }
+const Navigation = {
+    mounted() {
+        console.log("Navigation-mounted", this.$route.params)
+    },
+    template: `<div class="navigation">Navigation:{{$route.params.is}}
+    <router-view></router-view></div>`
+}
 
 // 2. 定义一些路由
 // 每个路由都需要映射到一个组件。
 // 我们后面再讨论嵌套路由。
 const routes = [{
-    path: '/',
+    name: 'LowView',
+    path: '/LowView',
     component: () =>
-        import ("../view/LowView/index.vue")
+        import ("../view/LowView/index.vue"),
+    children: [{
+        path: 'Navigation/:id',
+        name: 'navigation',
+        component: () =>
+            import ("../components/Lows/LowRouterTemplate/index.vue"),
+    }, ]
 }, ]
 
 // 3. 创建路由实例并传递 `routes` 配置

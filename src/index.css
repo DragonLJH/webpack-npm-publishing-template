@@ -1,0 +1,110 @@
+html,
+body,
+#app {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* dialog */
+
+.dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, .1);
+}
+
+.dialog-item {
+    width: var(--w);
+    height: var(--h);
+    background-color: #fff;
+    position: absolute;
+    /* top: calc(50% - var(--h)/2);
+    left: calc(50% - var(--w)/2); */
+}
+
+.dialog-item-title {
+    --icons-w: 50px;
+    height: 50px;
+    box-sizing: border-box;
+    border-bottom: solid 1px #eee;
+    display: flex;
+}
+
+.dialog-item-title-msg {
+    width: calc(100% - var(--icons-w));
+    padding-left: 25px;
+    line-height: 50px;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+.dialog-item-title-icons {
+    width: var(--icons-w);
+    height: 50px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.icon {
+    width: 24px;
+    height: 24px;
+    box-sizing: border-box;
+}
+
+.icon.icon-close {
+    --close-c: #000;
+    --close-b: #fff;
+    border-left: solid 1px var(--close-c);
+    border-bottom: solid 1px var(--close-c);
+    box-shadow: -2px 2px 1px -1px var(--close-c);
+    background-color: var(--close-b);
+    color: var(--close-c);
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.icon-close::after {
+    content: "×";
+}
+
+.dialog-item-main {
+    height: calc(100% - 50px - var(--footer-h));
+}
+
+.dialog-item-footer {
+    height: var(--footer-h);
+    border-top: solid 1px #ccc;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.dialog-item-footer .close {
+    display: inline-block;
+    padding: 0px 10px;
+    border: solid 1px #ccc;
+    border-radius: 10px;
+    height: 30px;
+    line-height: 30px;
+    cursor: pointer;
+    box-shadow: -1px 1px 1px 1px #ccc;
+}
+
+.dialog-item-footer .close:hover {
+    background-color: #eee;
+}
+
+
+/* dialog */

@@ -1,7 +1,8 @@
 <template>
     <div class="low-view">
         <div class="header">
-
+            <el-button v-if="props.isChilren && useRouter()?.$route?.params.id" type="primary"
+                @click="publishLowRouterView()">发布</el-button>
         </div>
         <div class="center">
             <div class="drag" @dragstart="dragstart">
@@ -13,6 +14,7 @@
             <div class="canvas" ref="canvas" @drop="drop" @dragover.prevent="() => { }" @mousedown=" targetIndex = -1">
                 <Control v-for="(item, index) in canvasItems.data" :key="Math.random() * 1000" :style="toPx(item.style)"
                     :target-index="targetIndex" @controldown="mousedown" :index="index" @closeItem="closeItem">
+                    <component :is="item.is" :props="item.props" />
                 </Control>
                 <!-- <div class="canvas-control" :class="targetIndex == index ? 'active' : ''"
                     v-for="(item, index) in canvasItems.data" :key="Math.random() * 1000" :style="toPx(item.style)"
@@ -22,29 +24,125 @@
                         v-for=" drop in ['r', 'b', 'rb']" :key="Math.random() * 1000"></div>
                 </div> -->
             </div>
-            <div class="config"></div>
+            <div class="config">
+                {{ canvasItems.data[targetIndex] }}
+                <div v-if="targetIndex !== -1 && canvasItems?.data[targetIndex].is == 'LowRouterLinks'">
+                    <el-button text @click="LowRouterLinksDialog = true">
+                        新增导航栏
+                    </el-button>
+                </div>
+                <div v-if="targetIndex !== -1 && canvasItems?.data[targetIndex].is == 'LowRouterView'">
+                    <el-button text @click="LowRouterViewDialog = true">
+                        导航视图修改
+                    </el-button>
+                </div>
+            </div>
         </div>
         <div class="footer"></div>
     </div>
+    <el-dialog v-if="targetIndex !== -1 && canvasItems?.data[targetIndex].is == 'LowRouterView'"
+        v-model="LowRouterViewDialog" title="Warning" fullscreen align-center>
+        <div style="height: 100vh;">
+            <LowView is-chilren :keyword="keyword"></LowView>
+        </div>
+    </el-dialog>
+    <el-dialog v-if="targetIndex !== -1 && canvasItems?.data[targetIndex].is == 'LowRouterLinks'"
+        v-model="LowRouterLinksDialog" title="Warning" fullscreen align-center>
+        <div>{{ canvasItems.data[targetIndex].props.paths }}</div>
+        <el-form ref="formRef" :inline="true" :model="formInline" class="demo-form-inline">
+            <el-form-item label="标题" prop="label" :rules="[
+                { required: true, message: '标题不能为空' },
+            ]">
+                <el-input v-model="formInline.label" placeholder="输入标题" clearable />
+            </el-form-item>
+            <el-form-item label="路径" prop="path" :rules="[
+                { required: true, message: '路径不能为空' },
+            ]">
+                <el-input v-model="formInline.path" placeholder="输入路径" clearable />
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="submitForm(formRef)">Submit</el-button>
+                <el-button @click="resetForm(formRef)">Reset</el-button>
+                <el-button type="primary" @click="publish()">发布</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
 </template>
 <script setup>
-import { reactive, ref, computed } from 'vue';
-import { toPx } from '../../utils/index';
+import { reactive, ref, defineProps,computed } from 'vue';
+import { toPx, getMergeUrl, useThis, useRouter } from '../../utils/index';
+import { Plus } from '@element-plus/icons-vue'
 import Control from "./Control.vue"
-
+import LowView from "./index.vue"
+const props = defineProps({
+    isChilren: { type: Boolean },
+    keyword:{
+        type:String,
+        default:""
+    }
+})
+const LowRouterLinksDialog = ref(false)
+const LowRouterViewDialog = ref(false) 
+const { strLows } = useThis()
 const canvas = ref()
 const targetIndex = ref(-1)
+const keyword = computed(()=>{
+    return useRouter().$route.params.id
+})
 
-const list = [{
-    is: "low-text",
-    lable: "文本",
-    id: 0,
-    style: {
-        width: 100,
-        height: 50,
+const list = strLows.filter(item => item.show).map((item, index) => {
+    return { ...item, id: index }
+})
+
+const formRef = ref()
+const formInline = reactive({
+    label: "",
+    path: ""
+})
+const submitForm = (formEl) => {
+    if (!formEl) return
+    formEl.validate((valid) => {
+        if (valid) {
+            canvasItems.data[targetIndex.value].props.paths.push({ ...formInline })
+            formEl.resetFields()
+        } else {
+            return false
+        }
+    })
+}
+
+const publishFetch = async (item, list = []) => {
+    const url = getMergeUrl("/userFileStorage/insertOrUpdateFile/18022429170/" + item )
+    let response = await fetch(url, {
+        mode: "cors",
+        credentials: "include",
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify(list)
+    });
+    return response.json()
+}
+
+const publish = () => {
+    const res = canvasItems.data[targetIndex.value].props.paths
+    Promise.all(res.map((item) => {
+        return publishFetch(item.path)
+    })).then((value) => {
+        console.log(value)
+    })
+}
+const publishLowRouterView = () => {
+    if (props.keyword) { 
+        publishFetch(props.keyword, canvasItems.data)
     }
-}]
 
+}
+const resetForm = (formEl) => {
+    if (!formEl) return
+    formEl.resetFields()
+}
 
 const canvasItems = reactive({
     data: []
@@ -58,7 +156,7 @@ const drop = (e) => {
     const index = e.dataTransfer.getData("index")
     const item = { ...list[index] }
     const { x: eX, y: eY } = e
-    const { x: cX, y: cY, width: cW, height: cH } = canvas.value.getBoundingClientRect()
+    const { x: cX, y: cY } = canvas.value.getBoundingClientRect()
     let left = eX - cX
     let top = eY - cY
     item.style = { ...item.style, top, left }
@@ -70,7 +168,7 @@ const mousedown = (dE, index, flag) => {
     const { x: eX, y: eY } = dE
     const { top: sY, left: sX, width: sW, height: sH } = canvasItems.data[index].style
     // getBoundingClientRect()获取 canvas 元素的左，上，右和下分别相对浏览器视窗的位置  
-    const { x: cX, y: cY, width: cW, height: cH } = canvas.value.getBoundingClientRect()
+    const { width: cW, height: cH } = canvas.value.getBoundingClientRect()
     const move = (mE) => {
         const { x: mX, y: mY } = mE
 
@@ -149,6 +247,8 @@ const closeItem = (index) => {
     border-right: solid 1px #ccc;
     display: flex;
     flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 10px;
 }
 
 .drag-item {
