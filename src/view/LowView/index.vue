@@ -24,8 +24,27 @@
                         v-for=" drop in ['r', 'b', 'rb']" :key="Math.random() * 1000"></div>
                 </div> -->
             </div>
-            <div class="config">
-                {{ canvasItems.data[targetIndex] }}
+            <div class="config"> 
+                <template v-if="targetIndex !== -1"> 
+                    <div class="config-item" v-for="([k, v], index) in Object.entries(myStyleConfig)" :key="index">
+                        <el-text style="width: 3rem;" truncated :title="v.label">{{ v.label }}</el-text>
+                        <el-input-number v-model="canvasItems.data[targetIndex].style[k]" :min="v.min" size="small" :precision="2"/>
+                    </div>
+                    <div class="config-item" 
+                        v-for="([k, v], index) in Object.entries(myPropsConfig.get(canvasItems.data[targetIndex].is))"
+                        :key="index">
+                        <el-text style="width: 3rem;" truncated :title="v.label">{{ v.label }}</el-text>
+                        <template v-if="v.type == 'String'">
+                            <el-input v-model="canvasItems.data[targetIndex].props[k]" placeholder="Please input" />
+                        </template>
+                        <template v-if="v.type == 'Array'">
+                            <el-select v-model="canvasItems.data[targetIndex].props[k]" clearable placeholder="Select">
+                                <el-option v-for="item in v.data" :key="item.value" :label="item.label"
+                                    :value="item.value" />
+                            </el-select>
+                        </template>
+                    </div> 
+                </template>
                 <div v-if="targetIndex !== -1 && canvasItems?.data[targetIndex].is == 'LowRouterLinks'">
                     <el-button text @click="LowRouterLinksDialog = true">
                         新增导航栏
@@ -52,12 +71,14 @@
         <el-form ref="formRef" :inline="true" :model="formInline" class="demo-form-inline">
             <el-form-item label="标题" prop="label" :rules="[
                 { required: true, message: '标题不能为空' },
-            ]">
+            ]
+                ">
                 <el-input v-model="formInline.label" placeholder="输入标题" clearable />
             </el-form-item>
             <el-form-item label="路径" prop="path" :rules="[
                 { required: true, message: '路径不能为空' },
-            ]">
+            ]
+                ">
                 <el-input v-model="formInline.path" placeholder="输入路径" clearable />
             </el-form-item>
             <el-form-item>
@@ -69,30 +90,31 @@
     </el-dialog>
 </template>
 <script setup>
-import { reactive, ref, defineProps,computed } from 'vue';
+import { reactive, ref, defineProps, computed } from 'vue';
 import { toPx, getMergeUrl, useThis, useRouter } from '../../utils/index';
 import { Plus } from '@element-plus/icons-vue'
 import Control from "./Control.vue"
 import LowView from "./index.vue"
 const props = defineProps({
     isChilren: { type: Boolean },
-    keyword:{
-        type:String,
-        default:""
+    keyword: {
+        type: String,
+        default: ""
     }
 })
 const LowRouterLinksDialog = ref(false)
-const LowRouterViewDialog = ref(false) 
-const { strLows } = useThis()
+const LowRouterViewDialog = ref(false)
+const { strLows, myPropsConfig, myStyleConfig } = useThis()
 const canvas = ref()
 const targetIndex = ref(-1)
-const keyword = computed(()=>{
+const keyword = computed(() => {
     return useRouter().$route.params.id
 })
 
-const list = strLows.filter(item => item.show).map((item, index) => {
-    return { ...item, id: index }
-})
+const list = props.isChilren ? strLows.filter((item) => {
+    return item.is.indexOf('Router') == -1
+}) : strLows
+console.log("123",list)
 
 const formRef = ref()
 const formInline = reactive({
@@ -112,7 +134,7 @@ const submitForm = (formEl) => {
 }
 
 const publishFetch = async (item, list = []) => {
-    const url = getMergeUrl("/userFileStorage/insertOrUpdateFile/18022429170/" + item )
+    const url = getMergeUrl("/userFileStorage/insertOrUpdateFile/18022429170/" + item)
     let response = await fetch(url, {
         mode: "cors",
         credentials: "include",
@@ -134,7 +156,7 @@ const publish = () => {
     })
 }
 const publishLowRouterView = () => {
-    if (props.keyword) { 
+    if (props.keyword) {
         publishFetch(props.keyword, canvasItems.data)
     }
 
@@ -154,14 +176,14 @@ const dragstart = (e) => {
 
 const drop = (e) => {
     const index = e.dataTransfer.getData("index")
-    const item = { ...list[index] }
+    const item = JSON.parse(JSON.stringify(list[index]))
+    console.log("drop", item)
     const { x: eX, y: eY } = e
     const { x: cX, y: cY } = canvas.value.getBoundingClientRect()
     let left = eX - cX
     let top = eY - cY
     item.style = { ...item.style, top, left }
     canvasItems.data.push(item)
-    console.log("drop", canvasItems.data)
 }
 const mousedown = (dE, index, flag) => {
     targetIndex.value = index
@@ -242,6 +264,14 @@ const closeItem = (index) => {
     padding: 10px;
     box-sizing: border-box;
 }
+
+.config-item {
+    display: flex;
+    gap: 5px;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
 
 .drag {
     border-right: solid 1px #ccc;

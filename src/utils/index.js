@@ -32,6 +32,6 @@ export const useRouter = () => {
 }
 export const useThis = () => {
     const instance = getCurrentInstance()
-    const { strLows } = instance.appContext.config.globalProperties
-    return { strLows }
+    const { strLows, myPropsConfig, myStyleConfig } = instance.appContext.config.globalProperties
+    return { strLows, myPropsConfig, myStyleConfig }
 }

@@ -2,6 +2,7 @@
     <div class="control" :class="props.targetIndex == props.index ? 'active' : ''" :style="props.style"
         @mousedown.stop="(e) => emit('controldown', e, props.index)">
         <div class="main">
+            <div class="modal"></div>
             <slot></slot>
         </div>
         <div class="icon close" @click="emit('closeItem', index)"></div>
@@ -17,8 +18,7 @@ const props = defineProps({
     index: { type: Number },
     targetIndex: { type: Number }
 })
-const emit = defineEmits(["controldown", "closeItem"])
-console.log("targetIndex",props.targetIndex)
+const emit = defineEmits(["controldown", "closeItem"]) 
 </script>
 <style scoped>
 .control {
@@ -32,10 +32,17 @@ console.log("targetIndex",props.targetIndex)
 }
 
 .main {
+    position: relative;
     display: inline-block;
     width: 100%;
     height: 100%;
     overflow: hidden;
+}
+.main>.modal{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255,255,255,0.01); 
 }
 
 .drop {

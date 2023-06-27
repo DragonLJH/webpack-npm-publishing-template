@@ -34,6 +34,7 @@ onMounted(() => {
     if ($route.params.id) {
         queryUKReadFile($route.params.id).then((val) => {
             data.list = JSON.parse(val.data)
+            console.log(data.list)
         })
     }
 
