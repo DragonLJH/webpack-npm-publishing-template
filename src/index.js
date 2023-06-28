@@ -9,7 +9,8 @@ import router from './router/index';
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import { install } from "./components/Lows/index.js"
+import { apiInstall } from "./api/index.js"
 
 const app = createApp(App)
-app.use(router).use(ElementPlus).use(install)
+app.use(router).use(ElementPlus).use(install).use(apiInstall)
 app.mount('#app')

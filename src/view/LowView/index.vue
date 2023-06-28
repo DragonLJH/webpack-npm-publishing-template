@@ -24,18 +24,59 @@
                         v-for=" drop in ['r', 'b', 'rb']" :key="Math.random() * 1000"></div>
                 </div> -->
             </div>
-            <div class="config"> 
-                <template v-if="targetIndex !== -1"> 
+            <div class="config">
+                <template v-if="targetIndex !== -1">
+                    <div class="demo-collapse">
+                        <el-collapse v-model="activeNames">
+                            <el-collapse-item title="位置大小" name="1">
+                                <div class="config-item" v-for="([k, v], index) in Object.entries(myStyleConfig)"
+                                    :key="index">
+                                    <el-text style="width: 3rem;" truncated :title="v.label">{{ v.label }}</el-text>
+                                    <el-input-number v-model="canvasItems.data[targetIndex].style[k]" :min="v.min"
+                                        size="small" :precision="2" />
+                                </div>
+                            </el-collapse-item>
+                            <el-collapse-item title="样式属性" name="2">
+                                <div class="config-item"
+                                    v-for="([k, v], index) in Object.entries(myPropsConfig.get(canvasItems.data[targetIndex].is))"
+                                    :key="index">
+                                    <el-text style="width: 3rem;" truncated :title="v.label">{{ v.label }}</el-text>
+                                    <template v-if="v.type == 'String'">
+                                        <el-input v-model="canvasItems.data[targetIndex].props[k]"
+                                            placeholder="Please input" />
+                                    </template>
+                                    <template v-if="v.type == 'Object'">
+                                        {{ canvasItems.data[targetIndex].props[k] }}
+                                    </template>
+                                    <template v-if="v.type == 'Array'">
+                                        <el-select v-model="canvasItems.data[targetIndex].props[k]" clearable
+                                            placeholder="Select">
+                                            <el-option v-for="item in v.data" :key="item.value" :label="item.label"
+                                                :value="item.value" />
+                                        </el-select>
+                                    </template>
+                                </div>
+                            </el-collapse-item>
+                        </el-collapse>
+                    </div>
+                </template>
+
+
+                <!-- <template v-if="targetIndex !== -1">
                     <div class="config-item" v-for="([k, v], index) in Object.entries(myStyleConfig)" :key="index">
                         <el-text style="width: 3rem;" truncated :title="v.label">{{ v.label }}</el-text>
-                        <el-input-number v-model="canvasItems.data[targetIndex].style[k]" :min="v.min" size="small" :precision="2"/>
+                        <el-input-number v-model="canvasItems.data[targetIndex].style[k]" :min="v.min" size="small"
+                            :precision="2" />
                     </div>
-                    <div class="config-item" 
+                    <div class="config-item"
                         v-for="([k, v], index) in Object.entries(myPropsConfig.get(canvasItems.data[targetIndex].is))"
                         :key="index">
                         <el-text style="width: 3rem;" truncated :title="v.label">{{ v.label }}</el-text>
                         <template v-if="v.type == 'String'">
                             <el-input v-model="canvasItems.data[targetIndex].props[k]" placeholder="Please input" />
+                        </template>
+                        <template v-if="v.type == 'Object'">
+                            {{ canvasItems.data[targetIndex].props[k] }}
                         </template>
                         <template v-if="v.type == 'Array'">
                             <el-select v-model="canvasItems.data[targetIndex].props[k]" clearable placeholder="Select">
@@ -43,8 +84,8 @@
                                     :value="item.value" />
                             </el-select>
                         </template>
-                    </div> 
-                </template>
+                    </div>
+                </template> -->
                 <div v-if="targetIndex !== -1 && canvasItems?.data[targetIndex].is == 'LowRouterLinks'">
                     <el-button text @click="LowRouterLinksDialog = true">
                         新增导航栏
@@ -90,8 +131,8 @@
     </el-dialog>
 </template>
 <script setup>
-import { reactive, ref, defineProps, computed } from 'vue';
-import { toPx, getMergeUrl, useThis, useRouter } from '../../utils/index';
+import { reactive, ref, defineProps, computed, onMounted } from 'vue';
+import { toPx, useThis, useRouter } from '../../utils/index';
 import { Plus } from '@element-plus/icons-vue'
 import Control from "./Control.vue"
 import LowView from "./index.vue"
@@ -102,9 +143,10 @@ const props = defineProps({
         default: ""
     }
 })
+const activeNames = ref([])
 const LowRouterLinksDialog = ref(false)
 const LowRouterViewDialog = ref(false)
-const { strLows, myPropsConfig, myStyleConfig } = useThis()
+const { strLows, myPropsConfig, myStyleConfig, api } = useThis()
 const canvas = ref()
 const targetIndex = ref(-1)
 const keyword = computed(() => {
@@ -114,7 +156,8 @@ const keyword = computed(() => {
 const list = props.isChilren ? strLows.filter((item) => {
     return item.is.indexOf('Router') == -1
 }) : strLows
-console.log("123",list)
+
+
 
 const formRef = ref()
 const formInline = reactive({
@@ -133,18 +176,8 @@ const submitForm = (formEl) => {
     })
 }
 
-const publishFetch = async (item, list = []) => {
-    const url = getMergeUrl("/userFileStorage/insertOrUpdateFile/18022429170/" + item)
-    let response = await fetch(url, {
-        mode: "cors",
-        credentials: "include",
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify(list)
-    });
-    return response.json()
+const publishFetch = (item, res = []) => {
+    return api.POSTAPI("insertOrUpdateFile", { userName: "18022429170", value: item, res })
 }
 
 const publish = () => {
@@ -227,6 +260,14 @@ const closeItem = (index) => {
     canvasItems.data.splice(index, 1)
     console.log("closeItem", index)
 }
+
+onMounted(() => {
+    if (props.isChilren) {
+        api.GETAPI("queryUKReadFile", { userName: "18022429170", value: props.keyword }).then((value) => {
+            canvasItems.data = JSON.parse(value.data)
+        })
+    }
+}) 
 </script>
 <style scoped>
 .low-view {

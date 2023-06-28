@@ -24,10 +24,14 @@ const emit = defineEmits(["controldown", "closeItem"])
 .control {
     position: absolute;
     outline: solid 1px #000;
+    overflow: hidden;
+}
+.control>div{
+    z-index: 1;
 }
 
-.control.active> .drop,
-.control.active> .close {
+.control.active>.drop,
+.control.active>.close {
     display: block;
 }
 
@@ -38,11 +42,17 @@ const emit = defineEmits(["controldown", "closeItem"])
     height: 100%;
     overflow: hidden;
 }
-.main>.modal{
+
+.main>div {
+    z-index: 0;
+}
+
+.main>.modal {
     position: absolute;
     width: 100%;
     height: 100%;
-    background-color: rgba(255,255,255,0.01); 
+    background-color: rgba(255, 255, 255, 0.01);
+    z-index: 1;
 }
 
 .drop {

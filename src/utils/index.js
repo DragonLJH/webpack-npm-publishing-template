@@ -10,21 +10,6 @@ export const toPx = (obj) => {
     return newObj
 }
 
-
-export const getMergeUrl = (url, params) => {
-    if (params) {
-        let data = Object.keys(params).map((item) => {
-            return item + "=" + params[item]
-        })
-        if (url.search(/\?/) !== -1) {
-            url += data.join("&")
-        } else {
-            url += "?" + data.join("&")
-        }
-    }
-    return DOMAIN + url
-}
-
 export const useRouter = () => {
     const instance = getCurrentInstance()
     const { $route, $router } = instance.appContext.config.globalProperties
@@ -32,6 +17,6 @@ export const useRouter = () => {
 }
 export const useThis = () => {
     const instance = getCurrentInstance()
-    const { strLows, myPropsConfig, myStyleConfig } = instance.appContext.config.globalProperties
-    return { strLows, myPropsConfig, myStyleConfig }
+    const { strLows, myPropsConfig, myStyleConfig, api } = instance.appContext.config.globalProperties
+    return { strLows, myPropsConfig, myStyleConfig, api }
 }
