@@ -24,12 +24,18 @@ module.exports = {
     ],
     module: {
         rules: [{
-            test: /\.css$/i,
-            use: ["style-loader", "css-loader"]
-        }, {
-            test: /\.vue$/i,
-            use: "vue-loader"
-        }]
+                test: /\.css$/i,
+                use: ["style-loader", "css-loader"]
+            }, {
+                test: /\.vue$/i,
+                use: "vue-loader"
+            },
+            {
+                test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                use: "file-loader"
+                    // type: "asset/resource"
+            }
+        ]
     },
     output: {
         filename: "js/bundle.js",

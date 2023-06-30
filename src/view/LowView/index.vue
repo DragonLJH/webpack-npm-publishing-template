@@ -45,47 +45,21 @@
                                         <el-input v-model="canvasItems.data[targetIndex].props[k]"
                                             placeholder="Please input" />
                                     </template>
-                                    <template v-if="v.type == 'Object'">
-                                        {{ canvasItems.data[targetIndex].props[k] }}
-                                    </template>
-                                    <template v-if="v.type == 'Array'">
+                                    <template v-if="v.type == 'Select'">
                                         <el-select v-model="canvasItems.data[targetIndex].props[k]" clearable
                                             placeholder="Select">
                                             <el-option v-for="item in v.data" :key="item.value" :label="item.label"
                                                 :value="item.value" />
                                         </el-select>
                                     </template>
+                                    <template v-if="v.type == 'Upload'">
+                                        <ConfigUpload v-model:src="canvasItems.data[targetIndex].props[k]"></ConfigUpload>
+                                    </template>
                                 </div>
                             </el-collapse-item>
                         </el-collapse>
                     </div>
                 </template>
-
-
-                <!-- <template v-if="targetIndex !== -1">
-                    <div class="config-item" v-for="([k, v], index) in Object.entries(myStyleConfig)" :key="index">
-                        <el-text style="width: 3rem;" truncated :title="v.label">{{ v.label }}</el-text>
-                        <el-input-number v-model="canvasItems.data[targetIndex].style[k]" :min="v.min" size="small"
-                            :precision="2" />
-                    </div>
-                    <div class="config-item"
-                        v-for="([k, v], index) in Object.entries(myPropsConfig.get(canvasItems.data[targetIndex].is))"
-                        :key="index">
-                        <el-text style="width: 3rem;" truncated :title="v.label">{{ v.label }}</el-text>
-                        <template v-if="v.type == 'String'">
-                            <el-input v-model="canvasItems.data[targetIndex].props[k]" placeholder="Please input" />
-                        </template>
-                        <template v-if="v.type == 'Object'">
-                            {{ canvasItems.data[targetIndex].props[k] }}
-                        </template>
-                        <template v-if="v.type == 'Array'">
-                            <el-select v-model="canvasItems.data[targetIndex].props[k]" clearable placeholder="Select">
-                                <el-option v-for="item in v.data" :key="item.value" :label="item.label"
-                                    :value="item.value" />
-                            </el-select>
-                        </template>
-                    </div>
-                </template> -->
                 <div v-if="targetIndex !== -1 && canvasItems?.data[targetIndex].is == 'LowRouterLinks'">
                     <el-button text @click="LowRouterLinksDialog = true">
                         新增导航栏
@@ -100,9 +74,10 @@
         </div>
         <div class="footer"></div>
     </div>
-    <el-dialog v-if="targetIndex !== -1 && canvasItems?.data[targetIndex].is == 'LowRouterView'"
-        v-model="LowRouterViewDialog" title="Warning" fullscreen align-center>
-        <div style="height: 100vh;">
+    <el-dialog custom-class="el-dialog-low-view"
+        v-if="targetIndex !== -1 && canvasItems?.data[targetIndex].is == 'LowRouterView'" v-model="LowRouterViewDialog"
+        title="Warning" fullscreen align-center>
+        <div style="height: 100vh;width: 100%;padding: 0;">
             <LowView is-chilren :keyword="keyword"></LowView>
         </div>
     </el-dialog>
@@ -134,6 +109,7 @@
 import { reactive, ref, defineProps, computed, onMounted } from 'vue';
 import { toPx, useThis, useRouter } from '../../utils/index';
 import { Plus } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import Control from "./Control.vue"
 import LowView from "./index.vue"
 const props = defineProps({
@@ -146,7 +122,7 @@ const props = defineProps({
 const activeNames = ref([])
 const LowRouterLinksDialog = ref(false)
 const LowRouterViewDialog = ref(false)
-const { strLows, myPropsConfig, myStyleConfig, api } = useThis()
+const { strLows, myPropsConfig, myStyleConfig, api, userName } = useThis()
 const canvas = ref()
 const targetIndex = ref(-1)
 const keyword = computed(() => {
@@ -176,8 +152,8 @@ const submitForm = (formEl) => {
     })
 }
 
-const publishFetch = (item, res = []) => {
-    return api.POSTAPI("insertOrUpdateFile", { userName: "18022429170", value: item, res })
+const publishFetch = (path, res = []) => {
+    return api.POSTAPI("/userFileStorage/insertOrUpdateFile", { userName, path, res })
 }
 
 const publish = () => {
@@ -202,6 +178,16 @@ const resetForm = (formEl) => {
 const canvasItems = reactive({
     data: []
 })
+
+
+const handleAvatarSuccess = (
+    response,
+    uploadFile
+) => {
+    console.log("handleAvatarSuccess", response,
+        uploadFile)
+
+}
 
 const dragstart = (e) => {
     e.dataTransfer.setData("index", e.target.dataset.index);
@@ -262,13 +248,20 @@ const closeItem = (index) => {
 }
 
 onMounted(() => {
+
     if (props.isChilren) {
-        api.GETAPI("queryUKReadFile", { userName: "18022429170", value: props.keyword }).then((value) => {
-            canvasItems.data = JSON.parse(value.data)
+        api.GETAPI("/userFileStorage/queryUKReadFile", { userName, path: props.keyword }).then((value) => {
+            if (value.data) canvasItems.data = JSON.parse(value.data)
         })
     }
 }) 
 </script>
+
+<style>
+.el-dialog-low-view > .el-dialog__body {
+    --el-dialog-padding-primary: 0px;
+}
+</style>
 <style scoped>
 .low-view {
     width: 100%;
@@ -340,5 +333,4 @@ onMounted(() => {
     position: relative;
 }
 </style>
-
 

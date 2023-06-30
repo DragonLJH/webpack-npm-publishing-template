@@ -11,7 +11,7 @@ export class myPropsConfig {
             },
             display: {
                 label: "显示方式",
-                type: "Array",
+                type: "Select",
                 data: [
                     { label: "默认", value: "" },
                     { label: "Flex", value: "flex" },
@@ -19,7 +19,7 @@ export class myPropsConfig {
             },
             aline: {
                 label: "排列方式",
-                type: "Array",
+                type: "Select",
                 data: [
                     { label: "默认", value: "" },
                     { label: "左", value: "left" },
@@ -29,6 +29,13 @@ export class myPropsConfig {
                 ]
             },
         },
+        "LowImg": {
+            src: {
+                label: "上传",
+                type: "Upload",
+            }
+
+        }
 
     }
     constructor() {}

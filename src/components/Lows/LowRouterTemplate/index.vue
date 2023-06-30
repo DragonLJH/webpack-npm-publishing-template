@@ -13,9 +13,9 @@
 import { onMounted, reactive } from "vue"
 import { useRouter, toPx, useThis } from '../../../utils/index';
 const { $route } = useRouter()
-const { api } = useThis()
+const { api,userName } = useThis()
 const queryUKReadFile = (item) => {
-    return api.GETAPI("queryUKReadFile", { userName: "18022429170", value: item })
+    return api.GETAPI("/userFileStorage/queryUKReadFile", { userName, path: item })
 }
 const data = reactive({
     list: []
@@ -24,8 +24,7 @@ const data = reactive({
 onMounted(() => {
     if ($route.params.id) {
         queryUKReadFile($route.params.id).then((val) => {
-            data.list = JSON.parse(val.data)
-            console.log(data.list)
+            if (val.data) data.list = JSON.parse(val.data)
         })
     }
 

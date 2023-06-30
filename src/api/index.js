@@ -12,7 +12,7 @@ export class Api {
     [GETMERGEURL](url, params) {
         if (params) {
             let data = Object.keys(params).map((item) => {
-                return item + "=" + params[item]
+                return item + "=" + (Object.prototype.toString.call(params[item]) == '[object Array]' ? JSON.stringify(params[item]) : params[item])
             })
             if (url.search(/\?/) !== -1) {
                 url += data.join("&")
@@ -23,17 +23,23 @@ export class Api {
         return DOMAIN + url
     }
 
-    [USERFILESTORAGE](api, { userName, value }) {
-        return this[GETMERGEURL](`/userFileStorage/${api}/${userName}/${value}`)
+    [USERFILESTORAGE](api, params) {
+        let { userName, path } = params
+        userName = userName && '/' + userName
+        path = path && '/' + path
+        api += userName ? userName : ""
+        api += path ? path : ""
+        return this[GETMERGEURL](api, params)
     }
 
-    async GETAPI(api = "", params = { userName: "", value: "" }) {
+    async GETAPI(api = "", params = {}) {
         let response = await fetch(this[USERFILESTORAGE](api, params), this[FETCHCONFIG]("GET"));
         return response.json()
     }
 
-    async POSTAPI(api = "", params = { userName: "", value: "", res: [] }) {
-        let response = await fetch(this[USERFILESTORAGE](api, params), {
+    async POSTAPI(api = "", params = { res: [] }) {
+        let { userName, path } = params
+        let response = await fetch(this[USERFILESTORAGE](api, { userName, path }), {
             ...this[FETCHCONFIG]("POST"),
             body: JSON.stringify(params.res)
         });

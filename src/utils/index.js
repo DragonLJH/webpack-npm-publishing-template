@@ -18,5 +18,6 @@ export const useRouter = () => {
 export const useThis = () => {
     const instance = getCurrentInstance()
     const { strLows, myPropsConfig, myStyleConfig, api } = instance.appContext.config.globalProperties
-    return { strLows, myPropsConfig, myStyleConfig, api }
+    const userName = "18022429170"
+    return { strLows, myPropsConfig, myStyleConfig, api, userName }
 }
