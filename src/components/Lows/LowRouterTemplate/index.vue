@@ -13,9 +13,9 @@
 import { onMounted, reactive } from "vue"
 import { useRouter, toPx, useThis } from '../../../utils/index';
 const { $route } = useRouter()
-const { api,userName } = useThis()
-const queryUKReadFile = (item) => {
-    return api.GETAPI("/userFileStorage/queryUKReadFile", { userName, path: item })
+const { api, userName } = useThis()
+const queryUKReadFile = (item) => { 
+    return api.GETAPI(api.montage("/userFileStorage/queryUKReadFile", { userName, path: item }))
 }
 const data = reactive({
     list: []

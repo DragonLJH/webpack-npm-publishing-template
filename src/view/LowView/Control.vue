@@ -2,7 +2,7 @@
     <div class="control" :class="props.targetIndex == props.index ? 'active' : ''" :style="props.style"
         @mousedown.stop="(e) => emit('controldown', e, props.index)">
         <div class="main">
-            <div class="modal"></div>
+            <!-- <div class="modal"></div> -->
             <slot></slot>
         </div>
         <div class="icon close" @click="emit('closeItem', index)"></div>

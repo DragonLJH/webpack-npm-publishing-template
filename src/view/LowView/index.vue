@@ -41,20 +41,29 @@
                                     v-for="([k, v], index) in Object.entries(myPropsConfig.get(canvasItems.data[targetIndex].is))"
                                     :key="index">
                                     <el-text style="width: 3rem;" truncated :title="v.label">{{ v.label }}</el-text>
-                                    <template v-if="v.type == 'String'">
-                                        <el-input v-model="canvasItems.data[targetIndex].props[k]"
-                                            placeholder="Please input" />
-                                    </template>
-                                    <template v-if="v.type == 'Select'">
-                                        <el-select v-model="canvasItems.data[targetIndex].props[k]" clearable
-                                            placeholder="Select">
-                                            <el-option v-for="item in v.data" :key="item.value" :label="item.label"
-                                                :value="item.value" />
-                                        </el-select>
-                                    </template>
-                                    <template v-if="v.type == 'Upload'">
-                                        <ConfigUpload v-model:src="canvasItems.data[targetIndex].props[k]"></ConfigUpload>
-                                    </template>
+                                    <div style="width: calc(100% - 3rem);">
+                                        <template v-if="v.type == 'String'">
+                                            <el-input v-model="canvasItems.data[targetIndex].props[k]"
+                                                placeholder="Please input" />
+                                        </template>
+                                        <template v-if="v.type == 'Select'">
+                                            <el-select v-model="canvasItems.data[targetIndex].props[k]" clearable
+                                                placeholder="Select">
+                                                <el-option v-for="item in v.data" :key="item.value" :label="item.label"
+                                                    :value="item.value" />
+                                            </el-select>
+                                        </template>
+                                        <template v-if="v.type == 'Upload'">
+                                            <ConfigUpload v-model:src="canvasItems.data[targetIndex].props[k]">
+                                            </ConfigUpload>
+                                        </template>
+                                        <template v-if="v.type == 'Uploads'">
+                                            <ConfigUploads v-model:srcArr="canvasItems.data[targetIndex].props[k]">
+                                            </ConfigUploads>
+                                        </template>
+                                    </div>
+
+
                                 </div>
                             </el-collapse-item>
                         </el-collapse>
@@ -153,7 +162,7 @@ const submitForm = (formEl) => {
 }
 
 const publishFetch = (path, res = []) => {
-    return api.POSTAPI("/userFileStorage/insertOrUpdateFile", { userName, path, res })
+    return api.POSTAPI(api.montage("/userFileStorage/insertOrUpdateFile", { userName, path }), res)
 }
 
 const publish = () => {
@@ -250,7 +259,7 @@ const closeItem = (index) => {
 onMounted(() => {
 
     if (props.isChilren) {
-        api.GETAPI("/userFileStorage/queryUKReadFile", { userName, path: props.keyword }).then((value) => {
+        api.GETAPI(api.montage("/userFileStorage/queryUKReadFile", { userName, path: props.keyword })).then((value) => {
             if (value.data) canvasItems.data = JSON.parse(value.data)
         })
     }
@@ -258,7 +267,7 @@ onMounted(() => {
 </script>
 
 <style>
-.el-dialog-low-view > .el-dialog__body {
+.el-dialog-low-view>.el-dialog__body {
     --el-dialog-padding-primary: 0px;
 }
 </style>
@@ -292,9 +301,14 @@ onMounted(() => {
     height: 100%;
 }
 
-.drag,
+.drag {
+    width: 150px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
 .config {
-    width: 200px;
+    width: 250px;
     padding: 10px;
     box-sizing: border-box;
 }

@@ -1,9 +1,9 @@
 <template>
-    <el-upload class="avatar-uploader" action="http://localhost:8787/userImgStorage/uploadImg/18022429170/qqq"
+    <el-upload class="avatar-uploader" :action="'http://localhost:8787/userImgStorage/uploadImg/' + userName"
         name="uploadImg" :show-file-list="false" :on-success="handleAvatarSuccess">
         <img v-if="props.src" :src="getImg(props.src)" class="avatar" />
         <el-icon v-else class="avatar-uploader-icon">
-            <Plus />
+            <el-icon><Plus /></el-icon>
         </el-icon>
     </el-upload>
 </template>

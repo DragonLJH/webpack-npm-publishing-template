@@ -35,6 +35,13 @@ export class myPropsConfig {
                 type: "Upload",
             }
 
+        },
+        "LowImgs": {
+            srcArr: {
+                label: "上传",
+                type: "Uploads",
+            }
+
         }
 
     }
