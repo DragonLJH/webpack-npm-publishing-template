@@ -16,12 +16,13 @@
     </div>
 </template>
 <script setup>
-import { defineProps, ref, computed } from "vue"
-import { useRouter } from "../../../utils/index.js"
+import { defineProps, ref, computed } from "vue" 
+import { useRoute } from 'vue-router'
 const data = defineProps(["props"])
+const route = useRoute()
 console.log("props", data.props)
 const activeIndex = computed(() => {
-    return useRouter()?.$route?.path
+    return route.path
 })
 
 const prefixPath = (value) => {

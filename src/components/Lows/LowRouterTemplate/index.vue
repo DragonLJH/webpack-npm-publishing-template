@@ -11,10 +11,11 @@
 
 <script setup>
 import { onMounted, reactive } from "vue"
-import { useRouter, toPx, useThis } from '../../../utils/index';
-const { $route } = useRouter()
+import { useRoute } from 'vue-router'
+import { toPx, useThis } from '../../../utils/index';
+const route = useRoute()
 const { api, userName } = useThis()
-const queryUKReadFile = (item) => { 
+const queryUKReadFile = (item) => {
     return api.GETAPI(api.montage("/userFileStorage/queryUKReadFile", { userName, path: item }))
 }
 const data = reactive({
@@ -22,8 +23,8 @@ const data = reactive({
 })
 
 onMounted(() => {
-    if ($route.params.id) {
-        queryUKReadFile($route.params.id).then((val) => {
+    if (route.params.id) {
+        queryUKReadFile(route.params.id).then((val) => {
             if (val.data) data.list = JSON.parse(val.data)
         })
     }

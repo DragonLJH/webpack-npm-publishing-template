@@ -1,7 +1,7 @@
 <template>
     <div class="low-view">
         <div class="header">
-            <el-button v-if="props.isChilren && useRouter()?.$route?.params.id" type="primary"
+            <el-button v-if="props.isChilren && route?.params.id" type="primary"
                 @click="publishLowRouterView()">发布</el-button>
         </div>
         <div class="center">
@@ -40,10 +40,10 @@
                                 <div class="config-item"
                                     v-for="([k, v], index) in Object.entries(myPropsConfig.get(canvasItems.data[targetIndex].is))"
                                     :key="index">
-                                    <el-text style="width: 3rem;" truncated :title="v.label">{{ v.label }}</el-text>
-                                    <div style="width: calc(100% - 3rem);">
+                                    <el-text truncated :title="v.label">{{ v.label }}</el-text>
+                                    <div style="flex: 1 1 calc(100% - 3rem);">
                                         <template v-if="v.type == 'String'">
-                                            <el-input v-model="canvasItems.data[targetIndex].props[k]"
+                                            <el-input v-model="canvasItems.data[targetIndex].props[k]" type="textarea"  :rows="3"
                                                 placeholder="Please input" />
                                         </template>
                                         <template v-if="v.type == 'Select'">
@@ -60,6 +60,9 @@
                                         <template v-if="v.type == 'Uploads'">
                                             <ConfigUploads v-model:srcArr="canvasItems.data[targetIndex].props[k]">
                                             </ConfigUploads>
+                                        </template>
+                                        <template v-if="v.type == 'InputArr'">
+                                            <ConfigInputArr v-model:inputArr="canvasItems.data[targetIndex].props[k]"> </ConfigInputArr>
                                         </template>
                                     </div>
 
@@ -116,11 +119,13 @@
 </template>
 <script setup>
 import { reactive, ref, defineProps, computed, onMounted } from 'vue';
-import { toPx, useThis, useRouter } from '../../utils/index';
+import { useRouter,useRoute } from 'vue-router'
+import { toPx, useThis } from '../../utils/index';
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import Control from "./Control.vue"
 import LowView from "./index.vue"
+const route = useRoute()
 const props = defineProps({
     isChilren: { type: Boolean },
     keyword: {
@@ -135,7 +140,7 @@ const { strLows, myPropsConfig, myStyleConfig, api, userName } = useThis()
 const canvas = ref()
 const targetIndex = ref(-1)
 const keyword = computed(() => {
-    return useRouter().$route.params.id
+    return route.params.id
 })
 
 const list = props.isChilren ? strLows.filter((item) => {
@@ -316,6 +321,7 @@ onMounted(() => {
 .config-item {
     display: flex;
     gap: 5px;
+    flex-wrap: wrap;
     justify-content: space-between;
     margin-top: 10px;
 }

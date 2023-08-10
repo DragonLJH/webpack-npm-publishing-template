@@ -42,7 +42,17 @@ export class myPropsConfig {
                 type: "Uploads",
             }
 
-        }
+        },
+        "LowForm": {
+            inputArr: {
+                label: "输入框组",
+                type: "InputArr",
+            },
+            action: {
+                label: "请求url",
+                type: "String"
+            }
+        },
 
     }
     constructor() {}
