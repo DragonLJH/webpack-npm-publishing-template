@@ -1,5 +1,4 @@
-import './index.css'
-// import install from "./components/index.js"
-import install from "webpack-npm-publishing-template"
-
-install()
+import ReactDOM from 'react-dom'; 
+import React from 'react'; 
+import App from './App'; 
+ReactDOM.render(<App />, document.getElementById('app'));
