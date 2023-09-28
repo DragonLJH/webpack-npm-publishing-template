@@ -33,11 +33,26 @@
     }
 
 
+#### 安装路由 react-router-dom 依赖
+
+    npm i react-router-dom@5 -D
 
 
+#### 安装 scss 预处理器
 
+    npm i sass --save-dev
 
+    npm i node-sass@6.0.1 --save-dev
+
+    npm i sass-loader@10.2.1 --save-dev
    
+    1. webpack 配置
+    {
+        test: /\.s?([ac])ss$/,
+        use: ['style-loader','css-loader','sass-loader'],
+        exclude: /\.min\.css$/,
+    }
+
 
 
 
