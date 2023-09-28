@@ -20,8 +20,13 @@ module.exports = {
     ],
     module: {
         rules: [{
-            test: /\.css$/i,
-            use: ["style-loader", "css-loader"]
+            test: /\.s?([ac])ss$/,
+            use: [
+                'style-loader',
+                'css-loader',
+                'sass-loader'
+            ],
+            exclude: /\.min\.css$/,
         }, {
             test: /\.(js|jsx)$/i,
             use: ["babel-loader"]
