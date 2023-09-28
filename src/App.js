@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
+
+import MyRouter from "./route/index"
 
 const App = () => {
-    const [number, setNumber] = useState(0)
-
     return (<>
-        <div className="App">{number}</div>
-        <button onClick={() => setNumber(number + 1)}>+1</button>
+        <MyRouter></MyRouter>
     </>)
-
 }
+
 
 export default App
