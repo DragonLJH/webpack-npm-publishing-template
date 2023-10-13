@@ -24,3 +24,15 @@ export const codeCanvas = (el, num = 4) => {
     })
     return str.join("")
 }
+
+// 防抖
+export const debounce = (fn, delay = 500) => {
+    let timer;
+    return (...args) => {
+        if (timer) clearTimeout(timer)
+        timer = setTimeout(() => {
+            fn(...args)
+            timer = null
+        }, delay)
+    }
+}
