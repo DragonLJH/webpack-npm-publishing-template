@@ -11,6 +11,12 @@ export const randomStr = (num) => {
 export const randomColor = () => {
     return "#" + Math.random().toString(16).slice(2, 8)
 }
+// 随机数
+export const randomNum = (num, zero = false) => {
+    const res = parseInt((Math.random() * num).toFixed(0))
+    return res || zero ? res : res + 1
+}
+
 // 验证码 画板
 export const codeCanvas = (el, num = 4) => {
     var str = randomStr(num)
@@ -36,3 +42,40 @@ export const debounce = (fn, delay = 500) => {
         }, delay)
     }
 }
+
+// 数组 转 map
+export const arrayToMap = (data, target) => {
+    let map = new Map()
+    data && data.forEach(function (item, index) {
+        const [key, value] = target(item, index) 
+        if (map.has(key)) {
+            if (Object.prototype.toString.call(map.get(key)) === "[object Object]") {
+                map.set(key, [map.get(key), value])
+            } 
+            if (Object.prototype.toString.call(map.get(key)) === "[object Array]") {
+                map.set(key, [...map.get(key), value])
+            }
+        } else {
+            map.set(key, value)
+        }
+
+    })
+    return map
+}
+
+Date.prototype.format = function (fmt) {
+    var o = {
+        "M+": this.getMonth() + 1, //月份
+        "d+": this.getDate(), //日
+        "H+": this.getHours(), //小时
+        "m+": this.getMinutes(), //分
+        "s+": this.getSeconds(), //秒
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+        S: this.getMilliseconds(), //毫秒
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt))
+            fmt = fmt.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+    return fmt;
+};

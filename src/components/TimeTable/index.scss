@@ -1,0 +1,153 @@
+@import "../../utils/index.scss";
+
+.time-table {
+    &.edit {
+        td {
+            .absent {
+                display: none;
+            }
+
+            &:hover {
+                .absent {
+                    height: 100%;
+                    display: block;
+                    background-color: #ccc;
+                    position: relative;
+
+                    &::after {
+                        content: "";
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        bottom: 0;
+                        left: 0;
+                        margin: auto;
+                        width: 40px;
+                        height: 5px;
+                        border-radius: 5px;
+                        background-color: #fff;
+
+                    }
+
+                    &::before {
+                        content: "";
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        bottom: 0;
+                        left: 0;
+                        margin: auto;
+                        width: 5px;
+                        height: 40px;
+                        border-radius: 5px;
+                        background-color: #fff;
+                    }
+                }
+            }
+        }
+    }
+
+    &-top {
+        display: flex;
+        height: 50px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+
+        &-main {
+            text-align: center;
+        }
+    }
+
+    &-main {
+        &-table {
+            --after: #999999;
+            --now: #ebb866;
+            --before: #6c9ddb;
+            --after-bg: #9999994d;
+            --now-bg: #ebb8664d;
+            --before-bg: #6c9ddb4d;
+
+            table-layout: fixed;
+            width: 100%;
+            border-collapse: collapse;
+            border: solid 1px #ccc;
+
+            tr {
+                >:first-child {
+                    width: 50px;
+                    text-align: center;
+                }
+            }
+
+            th,
+            td {
+                border: solid 1px #ccc;
+                height: 60px;
+                overflow: hidden;
+                height: 15vh;
+            }
+
+            th {
+                height: 30px;
+
+                &.after {
+                    background: no-repeat linear-gradient(to right, var(--after), var(--after));
+                    background-position: left bottom;
+                    background-size: 100% 3px;
+                }
+
+                &.now {
+                    background: no-repeat linear-gradient(to right, var(--now), var(--now));
+                    background-position: left bottom;
+                    background-size: 100% 3px;
+                }
+
+                &.before {
+                    background: no-repeat linear-gradient(to right, var(--before), var(--before));
+                    background-position: left bottom;
+                    background-size: 100% 3px;
+                }
+
+            }
+
+            td {
+                >div {
+                    border-radius: 10px;
+
+                    &.exist {
+                        height: calc(var(--row-span) * 100%);
+                    }
+
+                    >div {
+                        @include omit2;
+                    }
+                }
+
+                &.after-bg {
+                    background-color: var(--after-bg);
+
+                    .after {
+                        background-color: var(--after);
+                    }
+                }
+
+                &.now-bg {
+                    background-color: var(--now-bg);
+
+                    .now {
+                        background-color: var(--now);
+                    }
+                }
+
+                &.before-bg {
+                    background-color: var(--before-bg);
+
+                    .before {
+                        background-color: var(--before);
+                    }
+                }
+            }
+        }
+    }
+}

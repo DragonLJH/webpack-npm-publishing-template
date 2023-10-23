@@ -1,0 +1,13 @@
+@mixin omit1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@mixin omit2 {
+    overflow: hidden; 
+    word-break: break-all;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
