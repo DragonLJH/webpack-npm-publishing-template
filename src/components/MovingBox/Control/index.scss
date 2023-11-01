@@ -1,0 +1,95 @@
+@mixin getTrbl($list ) {
+
+    @each $direction,
+    $value in $list {
+        #{$direction}: $value;
+    }
+}
+
+.moving-box-control {
+    --circle-wc: 0px;
+    position: absolute;
+    box-sizing: border-box;
+    outline: solid 1px #ccc;
+
+    .moveComponent {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+
+        >div {
+            &:first-child {
+                overflow: auto;
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        &.active {
+            .circle {
+                position: absolute;
+                width: calc(var(--circle-wc) * 2);
+                height: calc(var(--circle-wc) * 2);
+                border-radius: 50%;
+                background-color: #40a9ff;
+                margin: auto;
+
+                /*  e-resize 	此光标指示矩形框的边缘可被向右（东）移动。
+                ne-resize 	此光标指示矩形框的边缘可被向上及向右移动（北/东）。
+                nw-resize 	此光标指示矩形框的边缘可被向上及向左移动（北/西）。
+                n-resize 	此光标指示矩形框的边缘可被向上（北）移动。
+                se-resize 	此光标指示矩形框的边缘可被向下及向右移动（南/东）。
+                sw-resize 	此光标指示矩形框的边缘可被向下及向左移动（南/西）。
+                s-resize 	此光标指示矩形框的边缘可被向下移动（南）。
+                w-resize 	此光标指示矩形框的边缘可被向左移动（西）。 */
+
+                /* "t","r","b","l","lt","rt","rb","lb" */
+                &.t {
+                    @include getTrbl((right 0, left 0, top calc(0px - var(--circle-wc))));
+                    cursor: n-resize;
+                }
+
+                &.r {
+                    @include getTrbl((top 0, bottom 0, right calc(0px - var(--circle-wc))));
+                    cursor: e-resize;
+                }
+
+                &.b {
+                    @include getTrbl((right 0, left 0, bottom calc(0px - var(--circle-wc))));
+                    cursor: s-resize;
+                }
+
+                &.l {
+                    @include getTrbl((top 0, bottom 0, left calc(0px - var(--circle-wc))));
+                    cursor: w-resize;
+                }
+
+                &.lt {
+                    @include getTrbl((top calc(0px - var(--circle-wc)), left calc(0px - var(--circle-wc))));
+                    cursor: nw-resize;
+                }
+
+                &.rt {
+                    @include getTrbl((top calc(0px - var(--circle-wc)), right calc(0px - var(--circle-wc))));
+                    cursor: ne-resize;
+                }
+
+                &.rb {
+                    @include getTrbl((right calc(0px - var(--circle-wc)), bottom calc(0px - var(--circle-wc))));
+                    cursor: se-resize;
+                }
+
+                &.lb {
+                    @include getTrbl((left calc(0px - var(--circle-wc)), bottom calc(0px - var(--circle-wc))));
+                    cursor: sw-resize;
+                }
+            }
+        }
+    }
+
+
+
+
+
+
+}

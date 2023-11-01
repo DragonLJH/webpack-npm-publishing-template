@@ -1,0 +1,11 @@
+.main-view {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 5px);
+
+    &-control {
+        position: absolute;
+        box-sizing: border-box;
+        border: solid 1px #ccc;
+    }
+}

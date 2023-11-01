@@ -1,3 +1,9 @@
+var id = 0;
+
+export const getID = () => {
+    return id++
+}
+
 var str = "abcdefghijkmnpqrstuvwxyABCDEFGHIJLMNOPQRSTUVWXYZ123456789"
 // 随机字符
 export const randomStr = (num) => {
@@ -47,11 +53,11 @@ export const debounce = (fn, delay = 500) => {
 export const arrayToMap = (data, target) => {
     let map = new Map()
     data && data.forEach(function (item, index) {
-        const [key, value] = target(item, index) 
+        const [key, value] = target(item, index)
         if (map.has(key)) {
             if (Object.prototype.toString.call(map.get(key)) === "[object Object]") {
                 map.set(key, [map.get(key), value])
-            } 
+            }
             if (Object.prototype.toString.call(map.get(key)) === "[object Array]") {
                 map.set(key, [...map.get(key), value])
             }
@@ -61,6 +67,17 @@ export const arrayToMap = (data, target) => {
 
     })
     return map
+}
+
+export const addPxSuffix = (data) => {
+    data = { ...data }
+    const list = ["top", "left", "width", "height"]
+    list.forEach(item => {
+        if (Object.hasOwn(data, item)) {
+            data[item] += "px"
+        }
+    })
+    return data
 }
 
 Date.prototype.format = function (fmt) {
