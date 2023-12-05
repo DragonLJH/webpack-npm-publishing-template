@@ -31,7 +31,15 @@ module.exports = {
             test: /\.(js|jsx)$/i,
             use: ["babel-loader"]
 
-        }]
+        }, {
+            test: /\.(xml|)$/i,
+            use: ["xml-loader"]
+
+        },
+        {
+          test: /\.(bpmn)$/,
+          type: 'asset/source'
+        },]
     },
     output: {
         filename: "js/bundle.js",

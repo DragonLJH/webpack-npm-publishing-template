@@ -1,0 +1,89 @@
+.flow-chart-view {
+    width: 100%;
+    height: 100%;
+
+    .flow-set-up {
+        --top-h: 50px;
+        --gap: 10px;
+        --left-w: 100px;
+        --right-w: 200px;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--gap);
+
+        >div {
+            outline: solid 1px #ccc;
+        }
+
+        &-top {
+            width: 100%;
+            height: var(--top-h);
+        }
+
+        &-main {
+            display: flex;
+            width: 100%;
+            height: calc(100% - var(--top-h) - var(--gap));
+            gap: var(--gap);
+
+            >div {
+                outline: solid 1px #ccc;
+            }
+
+            &-left {
+                width: calc(var(--left-w));
+                height: 100%;
+            }
+
+            &-canvas {
+                flex: 1 1 calc(100% - var(--left-w) - var(--right-w) - var(--gap));
+                height: 100%;
+                position: relative;
+            }
+
+            &-right {
+                width: calc(var(--right-w) - var(--gap));
+                height: 100%;
+            }
+        }
+
+
+    }
+
+    svg {
+
+        g.circle,
+        g.rect {
+            &.active {
+                .rect-outline {
+                    stroke-width: 0px;
+                    fill-opacity: 0;
+                    stroke: #0095ff;
+                    stroke-width: 1px;
+                    stroke-dasharray: 3, 5;
+                }
+            }
+
+            .rect-outline {
+                stroke-width: 0px;
+                fill-opacity: 0;
+            }
+
+            &:hover {
+                .rect-outline {
+                    stroke: #0095ff;
+                    stroke-width: 1px;
+                    stroke-dasharray: 3, 5;
+                }
+            }
+        }
+
+        .red {
+            stroke: #f00;
+            stroke-width: 5px;
+        }
+    }
+
+}

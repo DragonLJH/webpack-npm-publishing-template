@@ -1,0 +1,8 @@
+.bpmn-view {
+    width: 100%;
+    height: 100%;
+    &-steps{
+        display: flex;
+        gap: 10px;
+    }
+}

@@ -11,7 +11,7 @@ export const randomStr = (num) => {
         let index = Math.round(Math.random() * (str.length - 1))
         return str[index]
     })
-    return res
+    return res 
 }
 // 随机颜色
 export const randomColor = () => {
@@ -78,6 +78,17 @@ export const addPxSuffix = (data) => {
         }
     })
     return data
+}
+
+// 将字符串转换成xml对象
+export const stringToXML = (xmlString) => {
+    let parser = new DOMParser();
+    let xmlObject = parser.parseFromString(xmlString, "text/xml");
+    return xmlObject;
+}
+// 将xml对象转换成字符串
+export const xml2String = (xmlObject) => {
+    return (new XMLSerializer()).serializeToString(xmlObject);
 }
 
 Date.prototype.format = function (fmt) {
