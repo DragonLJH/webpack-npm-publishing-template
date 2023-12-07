@@ -117,6 +117,30 @@ const Bpmn = () => {
         const startBpmn = customList.find(([k, v]) => {
             return v.type == "bpmn:StartEvent"
         })
+
+        // bpmn 计算每条流程路径
+        const getPaths = ({ paths = {}, currently, children }, callback) => {
+            let len = 0
+            while (currently.length > len) {
+                len++
+                let target = currently[currently.length - 1]
+                let { nextNodes } = children[target]
+                nextNodes.forEach((item, index) => {
+                    if (nextNodes.length > 1) {
+                        paths[item] = getPaths({ paths, currently: [...currently, item], children })
+                    }
+                    else {
+                        currently = [...currently, item]
+                    }
+                })
+            }
+            callback && (Object.keys(paths).length ? callback(paths) : callback(currently))
+            return currently
+        }
+
+
+
+
         const processBpmn = customList.find(([k, v], index) => {
             let children = { ...customData }
             Object.entries(children).forEach(([k, v], index) => {
@@ -135,6 +159,12 @@ const Bpmn = () => {
             v["children"] = children
             return v.type == "bpmn:Process"
         })[1]
+
+        getPaths(processBpmn, (data) => {
+            processBpmn["paths"] = data
+        })
+
+
 
         console.log("processBpmn", processBpmn)
 

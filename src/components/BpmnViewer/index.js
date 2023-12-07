@@ -5,7 +5,7 @@ import ViewerModeler from 'bpmn-js';
 import exampleXML from './testDiagram.bpmn';
 
 const BpmnViewer = (props) => {
-    const { xml } = props
+    const { xml, map } = props
     const bpmnViewerCanvas = useRef(null)
     const [bpmnViewerModeler, setBpmnViewerModeler] = useState(null)
 
@@ -30,7 +30,7 @@ const BpmnViewer = (props) => {
     }, [bpmnViewerModeler, xml])
     return <div className="bpmn-viewer">
         <div className='bpmn-viewer-canvas' ref={bpmnViewerCanvas}></div>
-        {bpmnViewerModeler && <DataPanelViewer modeler={bpmnViewerModeler}></DataPanelViewer>}
+        {bpmnViewerModeler && <DataPanelViewer modeler={bpmnViewerModeler} map={map}></DataPanelViewer>}
     </div>
 }
 

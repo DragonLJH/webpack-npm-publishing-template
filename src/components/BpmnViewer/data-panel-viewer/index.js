@@ -3,13 +3,13 @@ import React, { useEffect, useState } from 'react';
 
 
 const DataPanelViewer = (props) => {
-    const { modeler } = props
+    const { modeler, map } = props
     const [flag, setFlag] = useState(true)
     const [selectedElements, setSelectedElements] = useState([])
     const [element, setElement] = useState(null)
 
     useEffect(() => {
-        console.log("eventBus", modeler.get('eventBus'))
+        console.log("eventBus", map)
         modeler.on("import.render.complete", () => {
             const overlays = modeler.get('overlays')
             const canvas = modeler.get("canvas")

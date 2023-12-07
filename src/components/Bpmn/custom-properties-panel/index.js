@@ -66,7 +66,7 @@ export default class CustomPropertiesPanel extends Component {
     }
     componentDidMount() {
         const { modeler, changeCustomData } = this.props;
-        
+
         ["root", "shape", "connection",].forEach(item => {
             ["added", "changed", "remove"].forEach(value => {
                 modeler.on(`${item}.${value}`, (e) => {
@@ -162,6 +162,10 @@ const ElementProperties = (props) => {
                 {element.type == "bpmn:SequenceFlow" && element.source.type == "bpmn:ExclusiveGateway" && <fieldset>
                     <label>条件</label>
                     <input value={element.businessObject.$attrs["conditionId"] || ""} onChange={(event) => { updateAttr("conditionId", event.target.value) }} />
+                </fieldset>}
+                {element.type == "bpmn:UserTask" && <fieldset>
+                    <label>userId</label>
+                    <input value={element.businessObject.$attrs["userId"] || ""} onChange={(event) => { updateAttr("userId", event.target.value) }} />
                 </fieldset>}
             </div>
 
