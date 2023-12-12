@@ -3,6 +3,7 @@ import { is } from 'bpmn-js/lib/util/ModelUtil';
 import { getID } from '../../../utils/index'
 
 import React, { Component, useEffect, useMemo, useState } from 'react';
+import { Button, Modal, Select } from 'antd';
 
 export const CustomPropertiesPanelHook = (props) => {
     const { modeler } = props
@@ -130,6 +131,21 @@ const ElementProperties = (props) => {
     if (element && element.labelTarget) {
         element = element.labelTarget;
     }
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+    const handleOk = () => {
+        setIsModalOpen(false);
+    };
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
+    const handleChange = (value) => {
+        console.log(`selected ${value}`);
+    };
+
     useEffect(() => {
         element && console.log("ElementProperties", element)
     })
@@ -163,13 +179,87 @@ const ElementProperties = (props) => {
                     <label>条件</label>
                     <input value={element.businessObject.$attrs["conditionId"] || ""} onChange={(event) => { updateAttr("conditionId", event.target.value) }} />
                 </fieldset>}
-                {element.type == "bpmn:UserTask" && <fieldset>
-                    <label>userId</label>
-                    <input value={element.businessObject.$attrs["userId"] || ""} onChange={(event) => { updateAttr("userId", event.target.value) }} />
-                </fieldset>}
-            </div>
+                {element.type == "bpmn:UserTask" && (<><HandlingRules callback={(data) => {
+                    Object.entries(data).forEach(([k, v]) => {
+                        updateAttr(k, v)
+                    })
+                }} /> </>)}
+            </div >
 
         }</>
     );
 }
 
+
+
+const HandlingRules = (props) => {
+    const defaultRules = {
+        mode: "",
+        peopleStr: undefined,
+        peopleList: [],
+    }
+    const { callback } = props
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [rules, setRules] = useState({ ...defaultRules });
+    const pOptions = [{ "user": "User_xFdVTAXA", "id": 10 },
+    { "user": "User_DLt4WRqI", "id": 1 },
+    { "user": "User_g8TwB329", "id": 2 },
+    { "user": "User_h38JU6r8", "id": 3 },
+    { "user": "User_PkAgPGAW", "id": 4 },
+    { "user": "User_RVWBNEU3", "id": 5 },
+    { "user": "User_T2FVwMbA", "id": 6 },
+    { "user": "User_VpdJgMiw", "id": 7 },
+    { "user": "User_S3AEs2jD", "id": 8 },
+    { "user": "User_R3J5XTRQ", "id": 9 }].map(({ user, id }) => {
+        return {
+            label: user,
+            value: id
+        }
+    })
+
+    const mOptions = [
+        { value: 'rules-1', label: '单人办理', },
+        { value: 'rules-2', label: '多人并行', },
+        { value: 'rules-3', label: '多人顺序', },
+        { value: 'rules-4', label: '多人任意', }
+    ]
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+    const handleOk = () => {
+        const { mode, peopleStr, peopleList } = rules
+        console.log("handleOk", { mode, peopleStr, peopleList })
+        setIsModalOpen(false);
+        if (peopleList.length) callback({ mode, people: peopleList })
+        else callback({ mode, people: peopleStr })
+    };
+    const handleCancel = () => {
+        setIsModalOpen(false);
+        setRules({ ...defaultRules })
+    };
+    const handleChange = (value) => {
+        console.log("{ ...rules, ...value }", { ...rules, ...value })
+        setRules({ ...rules, ...value })
+    };
+    return (<>
+        <Button type="primary" onClick={showModal}>
+            办理规则
+        </Button>
+        <Modal title="办理规则" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} destroyOnClose>
+            <div>办理方式</div>
+            <Select allowClear style={{ width: '100%', }} value={rules.mode}
+                onChange={value => handleChange({ ...defaultRules, mode: value })}
+                options={mOptions}
+            />
+            <div>办理人</div>
+            <Select allowClear value={rules.peopleStr}
+                style={{ width: '100%', display: (!rules.mode || rules.mode == 'rules-1' ? "block" : "none") }}
+                onChange={value => handleChange({ peopleStr: value, peopleList: [] })} options={pOptions}
+            />
+            <Select mode="multiple" value={rules.peopleList}
+                allowClear style={{ width: '100%', display: (rules.mode && rules.mode != 'rules-1' ? "block" : "none") }}
+                onChange={value => handleChange({ peopleList: value, peopleStr: undefined })} options={pOptions}
+            />
+        </Modal>
+    </>)
+}

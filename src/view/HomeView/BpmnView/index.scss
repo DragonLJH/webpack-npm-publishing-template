@@ -2,14 +2,17 @@
     width: 100%;
     height: 100%;
 
-    &-flow {
+    &-form {
         display: flex;
         gap: 10px;
         height: 100px;
-        >div {
-            flex: 1;
-            outline: solid 1px #ccc;
-        }
+        outline: solid 1px #ccc;
+    }
+
+    &-flow {
+        display: flex;
+        gap: 10px;
+        outline: solid 1px #ccc;
     }
 
     &-steps {
@@ -17,4 +20,14 @@
         gap: 10px;
     }
 
+}
+
+.user-views{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    .user-view{
+        width: calc(25% - 10px);
+        height: 100px;
+    }
 }
