@@ -106,13 +106,26 @@ const Bpmn = () => {
         })
     }
 
-    const saveXML = async () => {
+    const saveXML = async (id) => {
         const { xml } = await bpmnModeler.saveXML({ format: true });
-        console.log(xml);
+
+        const data = new FormData();
+        data.append('type','xml')
+        data.append('bpmnId',id)
+        data.append('bpmnFile', new File([xml], `${id}.xml`, {
+            type: 'application/xml'
+        })); 
+
+        fetch(`http://localhost:8787/bpmn/uploadXmlFile`, {
+            method: 'POST',
+            body: data
+        });
+
+        console.log(id, xml);
         localStorage.setItem("bpmnXml", xml)
     }
 
-    const save = () => {
+    const save = async () => {
         const customList = Object.entries(customData)
         const startBpmn = customList.find(([k, v]) => {
             return v.type == "bpmn:StartEvent"
@@ -164,12 +177,22 @@ const Bpmn = () => {
             processBpmn["paths"] = data
         })
 
+        const data = new FormData();
+        data.append('type','json')
+        data.append('bpmnId',processBpmn.id)
+        data.append('bpmnFile', new File([JSON.stringify(processBpmn)], `${processBpmn.id}.json`, {
+            type: 'application/json'
+        })); 
 
+        await fetch(`http://localhost:8787/bpmn/uploadXmlFile`, {
+            method: 'POST',
+            body: data
+        });
 
         console.log("processBpmn", processBpmn)
 
         localStorage.setItem("bpmnMap", JSON.stringify(processBpmn))
-        saveXML()
+        saveXML(processBpmn.id)
 
 
         // const startBpmn = Object.entries(customData).find(([k, v]) => {

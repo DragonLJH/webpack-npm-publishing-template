@@ -201,21 +201,25 @@ const HandlingRules = (props) => {
     const { callback } = props
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [rules, setRules] = useState({ ...defaultRules });
-    const pOptions = [{ "user": "User_xFdVTAXA", "id": 10 },
-    { "user": "User_DLt4WRqI", "id": 1 },
-    { "user": "User_g8TwB329", "id": 2 },
-    { "user": "User_h38JU6r8", "id": 3 },
-    { "user": "User_PkAgPGAW", "id": 4 },
-    { "user": "User_RVWBNEU3", "id": 5 },
-    { "user": "User_T2FVwMbA", "id": 6 },
-    { "user": "User_VpdJgMiw", "id": 7 },
-    { "user": "User_S3AEs2jD", "id": 8 },
-    { "user": "User_R3J5XTRQ", "id": 9 }].map(({ user, id }) => {
-        return {
-            label: user,
-            value: id
-        }
-    })
+    const [pOptions, setPOptions] = useState([])
+
+    const initPOptions = async () => {
+        const response = await fetch('http://localhost:8787/user/queryAllUser')
+        response.json().then(item => {
+            return item.map(({ userName, userId }) => {
+                return {
+                    label: userName,
+                    value: userId
+                }
+            })
+        }).then(res => {
+            setPOptions(res) 
+        })
+    }
+
+    useEffect(() => {
+        initPOptions()
+    }, [])
 
     const mOptions = [
         { value: 'rules-1', label: '单人办理', },
