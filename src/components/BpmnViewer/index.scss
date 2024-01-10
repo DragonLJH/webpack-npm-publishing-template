@@ -11,35 +11,136 @@
         height: calc(100% - var(--t-h));
     }
 
-    .state-complete:not(.djs-connection) .djs-visual> :nth-child(1) {
-        fill: #2f972f !important;
+
+
+    .state-complete {
+        --color: #2f972f;
+
+        &.djs-shape .djs-visual> :nth-child(1) {
+            fill: var(--color) !important;
+            stroke: var(--color) !important;
+            fill-opacity: 0.2 !important;
+        }
+
+        &.djs-shape .djs-visual> :nth-child(2) {
+            fill: var(--color) !important;
+        }
+
+        &.djs-shape .djs-visual>path {
+            fill: var(--color) !important;
+            fill-opacity: 0.2 !important;
+            stroke: var(--color) !important;
+        }
+
+        &.djs-connection>.djs-visual>path {
+            stroke: var(--color) !important;
+            marker-end: url(#sequenceflow-arrow-state-complete) !important;
+        }
     }
 
-    .state-complete .djs-visual> :nth-child(1) {
+    .state-carry-out {
+        --color: #ffa500;
+
+        &.djs-shape .djs-visual> :nth-child(1) {
+            fill: var(--color) !important;
+            stroke: var(--color) !important;
+            fill-opacity: 0.2 !important;
+            stroke-dasharray: 4;
+            animation: highlight-todo 35s linear infinite;
+        }
+
+        &.djs-shape .djs-visual> :nth-child(2) {
+            fill: var(--color) !important;
+        }
+
+        &.djs-shape .djs-visual>path {
+            fill: var(--color) !important;
+            fill-opacity: 0.2 !important;
+            stroke: var(--color) !important;
+        }
+
+        &.djs-connection>.djs-visual>path {
+            stroke: var(--color) !important;
+            marker-end: url(#sequenceflow-arrow-state-carry-out) !important;
+        }
+    }
+
+
+    .state-Incomplete {
+        --color: #cccccc;
+
+        &.djs-shape .djs-visual> :nth-child(1) {
+            fill: var(--color) !important;
+            stroke: var(--color) !important;
+            fill-opacity: 0.2 !important;
+        }
+
+        &.djs-shape .djs-visual> :nth-child(2) {
+            fill: var(--color) !important;
+        }
+
+        &.djs-shape .djs-visual>path {
+            fill: var(--color) !important;
+            fill-opacity: 0.2 !important;
+            stroke: var(--color) !important;
+        }
+
+        &.djs-connection>.djs-visual>path {
+            stroke: var(--color) !important;
+            marker-end: url(#sequenceflow-arrow-state-Incomplete) !important;
+        }
+    }
+
+    .state-finish {
+        --color: #7d0303;
+
+        &.djs-shape .djs-visual> :nth-child(1) {
+            fill: var(--color) !important;
+            stroke: var(--color) !important;
+            fill-opacity: 0.2 !important;
+        }
+
+        &.djs-shape .djs-visual> :nth-child(2) {
+            fill: var(--color) !important;
+        }
+
+        &.djs-shape .djs-visual>path {
+            fill: var(--color) !important;
+            fill-opacity: 0.2 !important;
+            stroke: var(--color) !important;
+        }
+
+        &.djs-connection>.djs-visual>path {
+            stroke: var(--color) !important;
+            marker-end: url(#sequenceflow-arrow-state-finish) !important;
+        }
+    }
+
+
+    #sequenceflow-arrow-state-complete {
+        fill: #2f972f !important;
         stroke: #2f972f !important;
     }
 
-    .state-carry-out:not(.djs-connection) .djs-visual> :nth-child(1) {
-        fill: #e4ca20 !important;
+    #sequenceflow-arrow-state-carry-out {
+        fill: #ffa500 !important;
+        stroke: #ffa500 !important;
     }
 
-    .state-carry-out .djs-visual> :nth-child(1) {
-        stroke: #e4ca20 !important;
-    }
-
-    .state-Incomplete:not(.djs-connection) .djs-visual> :nth-child(1) {
+    #sequenceflow-arrow-state-Incomplete {
         fill: #cccccc !important;
-    }
-
-    .state-Incomplete .djs-visual> :nth-child(1) {
         stroke: #cccccc !important;
     }
 
-    .state-finish:not(.djs-connection) .djs-visual> :nth-child(1) {
+    #sequenceflow-arrow-state-finish {
         fill: #7d0303 !important;
+        stroke: #7d0303 !important;
     }
 
-    .state-finish .djs-visual> :nth-child(1) {
-        stroke: #7d0303 !important;
+   
+}
+@keyframes highlight-todo {
+    to {
+        stroke-dashoffset: -1000
     }
 }

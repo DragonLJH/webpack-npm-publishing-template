@@ -1,6 +1,6 @@
 import "./index.scss"
 import React, { memo, useContext, useEffect, useMemo, useRef, useState, createContext, useCallback } from 'react';
-import { Button, Form, Input, Select } from 'antd';
+import { Button, Form, Input, Select, Modal } from 'antd';
 import { randomStr } from "../../../utils/index"
 import Bpmn from '../../../components/Bpmn/index.js'
 import BpmnViewer from '../../../components/BpmnViewer/index.js'
@@ -142,21 +142,22 @@ const FormView = () => {
     initFlowOptions()
   }, [])
   const initFlowOptions = () => {
-    fetch(`http://localhost:8787/bpmn/queryAllBpmn`, {
+    fetch(`http://localhost:8687/bpmn/queryAllBpmn`, {
       method: 'GET'
     }).then((res) => {
       return res.json()
-    }).then((res) => {
-      setFlowOptions(res.map(({ bpmnId }) => { return { value: bpmnId, label: bpmnId } }))
+    }).then(({ result }) => {
+      setFlowOptions(result.map(({ bpmnId }) => { return { value: bpmnId, label: bpmnId } }))
     })
   }
 
   const selectChange = (bpmnId) => {
-    fetch(`http://localhost:8787/bpmn/queryBpmnFileMsgById/${bpmnId}`, {
+    fetch(`http://localhost:8687/bpmn/queryBpmnMsgById/${bpmnId}`, {
       method: 'GET'
     }).then(item => {
       return item.json()
-    }).then(({ bpmnMap }) => {
+    }).then(({ result }) => result).then(({ bpmnMap }) => {
+      console.log("***********", bpmnMap)
       if (bpmnMap) {
         const { paths, children } = JSON.parse(bpmnMap)
         let o = {}
@@ -183,10 +184,10 @@ const FormView = () => {
 
   const submit = async (formMsg) => {
     const { flowId, formId, conditionId } = formMsg
-    const res = await fetch(`http://localhost:8787/bpmn/queryBpmnFileMsgById/${flowId}`, {
+    const res = await fetch(`http://localhost:8687/bpmn/queryBpmnMsgById/${flowId}`, {
       method: 'GET'
     })
-    res.json().then(({ bpmnMap }) => {
+    res.json().then(res => res.result).then(({ bpmnMap }) => {
       let resPath = []
       if (bpmnMap) {
         const { paths, children } = JSON.parse(bpmnMap)
@@ -196,6 +197,24 @@ const FormView = () => {
         for (let i = 0; i < resPath.length; i++) {
           let item = resPath[i]
           if (item.type == "bpmn:UserTask") {
+            const { mode, people } = item.attrs
+            const execute = async (userId) => {
+              const data = new FormData();
+              data.append('bpmnId', flowId)
+              data.append('userId', userId)
+              data.append('mode', mode)
+              await fetch(`http://localhost:8687/userBpmn/save`, {
+                method: 'POST',
+                body: data
+              });
+            }
+            if (Object.prototype.toString.call(people) == "[object Array]") {
+              people.forEach(item => {
+                execute(item)
+              })
+            } else {
+              execute(people)
+            }
             item.state = 2
             break;
           } else {
@@ -205,11 +224,14 @@ const FormView = () => {
         const data = new FormData();
         data.append('formId', formId)
         data.append('bpmnId', flowId)
+        data.append('formFile', new File([JSON.stringify(formMsg)], `${formId}.json`, {
+          type: 'application/json'
+        }));
         data.append('bpmnFile', new File([JSON.stringify(resPath)], `${formId}.json`, {
           type: 'application/json'
         }));
 
-        fetch(`http://localhost:8787/formBpmn/insertFormBpmn`, {
+        fetch(`http://localhost:8687/formBpmn/saveOrUpdate`, {
           method: 'POST',
           body: data
         }).then(item => {
@@ -290,45 +312,101 @@ const setMap = (map, key, value) => {
     map[key] = [value]
   }
 }
+
+const ModalDiv = (props) => {
+  const { formId, bpmnId } = props
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [bpmnXml, setBpmnXml] = useState(null)
+  const [map, setMap] = useState(null)
+
+  useEffect(() => {
+    formId && init()
+  }, [formId])
+  const init = async () => {
+    const resMap = await fetch(`http://localhost:8687/formBpmn/queryFormBpmnMsgById/${formId}`)
+    resMap.json().then(res => res.result).then(({ bpmnMap }) => {
+      bpmnMap && setMap(JSON.parse(bpmnMap))
+      
+    })
+    const resXml = await fetch(`http://localhost:8687/bpmn/queryBpmnMsgById/${bpmnId}`)
+    resXml.json().then(res => res.result).then(({ xml }) => {
+      setBpmnXml(xml)
+    })
+    setIsModalOpen(true)
+  }
+  const handleOk = () => {
+    setIsModalOpen(false)
+  }
+  const handleCancel = () => {
+    setIsModalOpen(false)
+
+  }
+  return <>
+    <div className="modal-div">
+      <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} width={1000} destroyOnClose>
+        <div style={{ width: 1000, height: "100vh" }}>
+          {map && bpmnXml && <BpmnViewer xml={bpmnXml} map={map}></BpmnViewer>}
+        </div>
+
+      </Modal>
+    </div>
+  </>
+}
+
+const GetMsg = (props) => {
+  const { userId } = props
+  const [list, setList] = useState([])
+  const [formId, setFormId] = useState("")
+  const [bpmnId, setBpmnId] = useState("")
+  useEffect(() => {
+    init(userId)
+  }, [userId])
+  const init = async (userId) => {
+    const response = await fetch(`http://localhost:8687/userBpmn/queryUserBpmnByUserId/${userId}`)
+    response.json().then(res => res.result).then(item => {
+      return Promise.all(item.map(async ({ bpmnId }) => {
+        return await fetch(`http://localhost:8687/formBpmn/queryFormBpmnBybpmnId/${bpmnId}`)
+      }))
+      // setBpmnList(item.map(res=>res.bpmnId))  
+    }).then(res => {
+      return Promise.all(res.map(item => item.json()))
+    }).then(res => {
+      let list = []
+      res.forEach(({ result }, index) => {
+        list = [...list, ...result]
+      })
+      return list
+    }).then(res => {
+      setList(res)
+    })
+  }
+
+  const formClick = ({ formId, bpmnId }) => {
+    setFormId(formId)
+    setBpmnId(bpmnId)
+  }
+  return <>
+    <div className="get-msg">
+      {list.map((item, index) => {
+        console.log("get-msg", item)
+        return <div key={index} onClick={() => formClick(item)}>{item.formId}</div>
+      })}
+      <ModalDiv formId={formId} bpmnId={bpmnId} />
+    </div>
+  </>
+}
 const UserViews = () => {
   const [userList, setUserList] = useState([])
   const cData = useContext(PContext);
-  const msg = useCallback((id) => {
-    let map = {}
-    Object.keys(cData.flowPath).forEach(flow => {
-      let res = JSON.parse(localStorage.getItem(flow))
-      console.log("res", res)
-      res && res.forEach(({ resPath, formMsg }, index) => {
-        let { attrs } = resPath.find(({ state }) => state == 2)
-        if (Object.prototype.toString.call(attrs.people) === '[object String]') {
-          setMap(map, attrs.people, { resPath, formMsg, index })
-        } else {
-          attrs.people.forEach(value => {
-            setMap(map, value, { resPath, formMsg, index })
-          })
-        }
-      })
-    })
-    return map[id]
-  }, [])
-
-  const agree = ({ resPath, formMsg, index }) => {
-    console.log("agree", JSON.parse(localStorage.getItem(formMsg.flowId)))
-
-  }
-
   const initUserList = async () => {
-    const response = await fetch('http://localhost:8787/user/queryAllUser')
-    response.json().then(item => {
+    const response = await fetch('http://localhost:8687/user/queryAllUser')
+    response.json().then(res => res.result).then(item => {
       setUserList(item)
     })
   }
   useEffect(() => {
     initUserList()
   }, [])
-
-
-
 
   return <div className="user-views">
     {userList.map(item => {
@@ -337,6 +415,7 @@ const UserViews = () => {
           {item.userName}
         </div>
         <div className="user-view-main">
+          <GetMsg userId={item.userId} />
           {/* {msg(item.id).map(({ resPath, formMsg, index }, i) => {
             return <div className="user-view-main-item" key={i} onClick={() => cData.changeView(formMsg.flowId)}>
               <div>{formMsg.formId}</div>
@@ -350,8 +429,7 @@ const UserViews = () => {
 }
 
 const BpmnView = () => {
-  const [conditionId, setConditionId] = useState(null)
-  const [flowPath, setFlowPath] = useState(defaultFlowPath)
+  const [conditionId, setConditionId] = useState(null) 
   const [bpmnView, setBpmnView] = useState(null)
   const [bpmnXml, setBpmnXml] = useState(null)
   useEffect(() => {
@@ -371,15 +449,7 @@ const BpmnView = () => {
 
   }, [])
 
-  const changeView = (state) => {
-    if (state && flowPath[state]) {
-      setBpmnView(flowPath[state].bpmnMap)
-      setBpmnXml(flowPath[state].xml)
-    } else {
-      state = Object.keys(flowPath)[0]
-      setBpmnView(flowPath[state].bpmnMap)
-      setBpmnXml(flowPath[state].xml)
-    }
+  const changeView = (state) => { 
   }
 
 
@@ -391,24 +461,7 @@ const BpmnView = () => {
     initFlowPath()
   }
 
-  const initFlowPath = async () => {
-    let allBpmn = await fetch(`http://localhost:8787/bpmn/queryAllBpmn`, {
-      method: 'GET'
-    })
-    allBpmn.json().then((res) => {
-      Promise.all(res.map(async ({ bpmnId, mapFile, xmlFile }) => {
-        return await fetch(`http://localhost:8787/bpmn/queryBpmnFileMsgById/${bpmnId}`, {
-          method: 'GET'
-        })
-      })).then((item) => {
-        return Promise.all(item.map(v => v.json()))
-      }).then((item, flowPath = {}) => {
-        item.forEach(({ bpmnId, xml, bpmnMap }) => {
-          flowPath[bpmnId] = { xml, bpmnMap }
-        })
-        setFlowPath(flowPath)
-      })
-    });
+  const initFlowPath = async () => { 
   }
 
 
@@ -424,7 +477,7 @@ const BpmnView = () => {
 
   }
 
-  return <PContext.Provider value={{ bpmnView, changeView, saveMap, flowPath }} >
+  return <PContext.Provider value={{ bpmnView, changeView, saveMap }} >
     <div className="bpmn-view">
       <div className="bpmn-view-form">
         <FormView></FormView>
@@ -432,9 +485,9 @@ const BpmnView = () => {
       <div className="bpmn-view-flow">
         <UserViews></UserViews>
       </div>
-      {bpmnView && <>
+      {/* {bpmnView && <>
         {bpmnXml && <BpmnViewer xml={bpmnXml} map={bpmnView}></BpmnViewer>}
-      </>}
+      </>} */}
       <Bpmn />
     </div>
   </PContext.Provider>

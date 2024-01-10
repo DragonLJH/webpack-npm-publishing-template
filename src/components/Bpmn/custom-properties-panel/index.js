@@ -53,7 +53,7 @@ export const CustomPropertiesPanelHook = (props) => {
 export default class CustomPropertiesPanel extends Component {
     constructor(props) {
         super(props);
-        this.state = { selectedElements: [], element: null };
+        this.state = { selectedElements: [], element: null, rootElement: null };
     }
     componentDidUpdate() {
         const { modeler } = this.props;
@@ -61,7 +61,8 @@ export default class CustomPropertiesPanel extends Component {
         const rootElement = modeler.get("canvas").getRootElement()
         if (rootElement.type == "bpmn:Process" && !element) {
             this.setState({
-                element: rootElement
+                element: rootElement,
+                rootElementId: rootElement.id
             });
         }
     }
@@ -108,13 +109,13 @@ export default class CustomPropertiesPanel extends Component {
 
     render() {
         const { modeler } = this.props;
-        const { selectedElements, element } = this.state;
+        const { selectedElements, element, rootElementId } = this.state;
 
         return (
             <div className='custom-properties-panel'>
                 <div>
                     {selectedElements.length > 1 ? <span>Please select a single element.</span> :
-                        <ElementProperties modeler={modeler} element={element} />
+                        <ElementProperties modeler={modeler} element={element} rootElementId={rootElementId} />
                     }
                 </div>
                 <button onClick={() => this.saveXML()}>saveXML</button>
@@ -127,24 +128,11 @@ export default class CustomPropertiesPanel extends Component {
 
 
 const ElementProperties = (props) => {
-    let { element, modeler } = props;
+    let { element, modeler, rootElementId } = props;
     if (element && element.labelTarget) {
         element = element.labelTarget;
     }
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const showModal = () => {
-        setIsModalOpen(true);
-    };
-    const handleOk = () => {
-        setIsModalOpen(false);
-    };
-    const handleCancel = () => {
-        setIsModalOpen(false);
-    };
-    const handleChange = (value) => {
-        console.log(`selected ${value}`);
-    };
 
     useEffect(() => {
         element && console.log("ElementProperties", element)
@@ -164,6 +152,12 @@ const ElementProperties = (props) => {
         modeling.updateProperties(element, { ...o });
     }
 
+    function handlingRulesCallback(data) { 
+        Object.entries(data).forEach(([k, v]) => {
+            updateAttr(k, v)
+        })
+    }
+
     return (
         <>{element &&
             <div className="element-properties" key={element.id}>
@@ -179,11 +173,7 @@ const ElementProperties = (props) => {
                     <label>条件</label>
                     <input value={element.businessObject.$attrs["conditionId"] || ""} onChange={(event) => { updateAttr("conditionId", event.target.value) }} />
                 </fieldset>}
-                {element.type == "bpmn:UserTask" && (<><HandlingRules callback={(data) => {
-                    Object.entries(data).forEach(([k, v]) => {
-                        updateAttr(k, v)
-                    })
-                }} /> </>)}
+                {element.type == "bpmn:UserTask" && (<><HandlingRules callback={handlingRulesCallback} /> </>)}
             </div >
 
         }</>
@@ -204,8 +194,8 @@ const HandlingRules = (props) => {
     const [pOptions, setPOptions] = useState([])
 
     const initPOptions = async () => {
-        const response = await fetch('http://localhost:8787/user/queryAllUser')
-        response.json().then(item => {
+        const response = await fetch('http://localhost:8687/user/queryAllUser')
+        response.json().then(({ result }) => result).then(item => {
             return item.map(({ userName, userId }) => {
                 return {
                     label: userName,
@@ -213,7 +203,7 @@ const HandlingRules = (props) => {
                 }
             })
         }).then(res => {
-            setPOptions(res) 
+            setPOptions(res)
         })
     }
 
@@ -230,12 +220,18 @@ const HandlingRules = (props) => {
     const showModal = () => {
         setIsModalOpen(true);
     };
-    const handleOk = () => {
+    const handleOk = async () => {
         const { mode, peopleStr, peopleList } = rules
         console.log("handleOk", { mode, peopleStr, peopleList })
         setIsModalOpen(false);
-        if (peopleList.length) callback({ mode, people: peopleList })
-        else callback({ mode, people: peopleStr })
+        if (peopleList.length) {
+            // const response = await fetch('http://localhost:8687/userBpmn/save')
+            callback({ mode, people: peopleList })
+
+        }
+        else {
+            callback({ mode, people: peopleStr })
+        }
     };
     const handleCancel = () => {
         setIsModalOpen(false);

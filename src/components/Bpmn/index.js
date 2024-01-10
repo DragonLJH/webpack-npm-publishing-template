@@ -110,13 +110,12 @@ const Bpmn = () => {
         const { xml } = await bpmnModeler.saveXML({ format: true });
 
         const data = new FormData();
-        data.append('type','xml')
-        data.append('bpmnId',id)
-        data.append('bpmnFile', new File([xml], `${id}.xml`, {
+        data.append('bpmnId', id)
+        data.append('file', new File([xml], `${id}.xml`, {
             type: 'application/xml'
-        })); 
+        }));
 
-        fetch(`http://localhost:8787/bpmn/uploadXmlFile`, {
+        fetch(`http://localhost:8687/bpmn/saveOrUpdate`, {
             method: 'POST',
             body: data
         });
@@ -130,6 +129,7 @@ const Bpmn = () => {
         const startBpmn = customList.find(([k, v]) => {
             return v.type == "bpmn:StartEvent"
         })
+
 
         // bpmn 计算每条流程路径
         const getPaths = ({ paths = {}, currently, children }, callback) => {
@@ -154,10 +154,13 @@ const Bpmn = () => {
 
 
 
-        const processBpmn = customList.find(([k, v], index) => {
-            let children = { ...customData }
+        const processBpmn = customList.find(([key, value], index) => {
+
+            // 修复不能重复保存bug
+            let children = JSON.parse(JSON.stringify(customData))
             Object.entries(children).forEach(([k, v], index) => {
-                const { targetRef, outgoing } = v
+                const { targetRef, outgoing, type, attrs } = v
+                
                 if (targetRef) {
                     children[k]["nextNodes"] = [targetRef.id]
                     delete children[k]["targetRef"]
@@ -167,24 +170,26 @@ const Bpmn = () => {
                     delete children[k]["outgoing"]
                 }
             })
-            v["currently"] = [startBpmn[0]]
-            delete children[k]
-            v["children"] = children
-            return v.type == "bpmn:Process"
+
+            value["currently"] = [startBpmn[0]]
+            delete children[key]
+            value["children"] = children
+            return value.type == "bpmn:Process"
         })[1]
+
+
 
         getPaths(processBpmn, (data) => {
             processBpmn["paths"] = data
         })
 
         const data = new FormData();
-        data.append('type','json')
-        data.append('bpmnId',processBpmn.id)
-        data.append('bpmnFile', new File([JSON.stringify(processBpmn)], `${processBpmn.id}.json`, {
+        data.append('bpmnId', processBpmn.id)
+        data.append('file', new File([JSON.stringify(processBpmn)], `${processBpmn.id}.json`, {
             type: 'application/json'
-        })); 
+        }));
 
-        await fetch(`http://localhost:8787/bpmn/uploadXmlFile`, {
+        await fetch(`http://localhost:8687/bpmn/saveOrUpdate`, {
             method: 'POST',
             body: data
         });

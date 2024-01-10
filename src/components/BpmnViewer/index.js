@@ -22,6 +22,7 @@ const BpmnViewer = (props) => {
         bpmnViewerModeler && xml && bpmnViewerModeler.importXML(xml).then(function (result) {
             const { warnings } = result;
             console.log('success !', warnings);
+            bpmnViewerModeler.get("canvas").zoom("fit-viewport", "auto");
         }).catch(function (err) {
             const { warnings, message } = err;
             console.log('something went wrong:', warnings, message);
