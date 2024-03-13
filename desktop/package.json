@@ -1,0 +1,58 @@
+{
+  "name": "desktop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev-electron": "cross-env NODE_ENV=development electron main/index.js",
+    "prod-electron": "cross-env NODE_ENV=production electron main/index.js",
+    "build-electron-win64": "electron-builder -w --x64"
+  },
+  "build": {
+    "appId": "com.example.my-electron-app",
+    "productName": "My Electron App",
+    "directories": {
+      "output": "electron_dist"
+    },
+    "files": [
+      "main/**/*",
+      "src/**/*",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      "icons/**/*",
+      "dist/**/*"
+    ],
+    "asar": true,
+    "dmg": {
+      "title": "My Electron App",
+      "icon": "icons/icon.icns"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "zip"
+        }
+      ],
+      "artifactName": "${productName}_${version}.${ext}"
+    },
+    "linux": {
+      "category": "Utility"
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "electron": "14.0.0",
+    "electron-builder": "^24.13.3"
+  }
+}
