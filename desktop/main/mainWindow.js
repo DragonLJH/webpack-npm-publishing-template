@@ -32,6 +32,7 @@ function createMainWindow() {
   mainWindow.once("ready-to-show", () => {
     mainWindow.show();
   });
+  return mainWindow
 }
 
 module.exports = { createMainWindow };

@@ -1,8 +1,10 @@
 const { app } = require("electron");
 const { createMainWindow } = require("./mainWindow");
-
+const { ipcFun } = require("./ipc");
+let win;
 app.on("ready", () => {
-  createMainWindow();
+  win = createMainWindow();
+  ipcFun(win);
 });
 app.on(
   "certificate-error",
@@ -22,7 +24,7 @@ app.on("activate", function () {
 });
 app.on("quit", function () {
   console.log("quit");
-  getTray() && getTray().destroy();
+  // win.destroy();
 });
 app.on("will-quit", function () {
   console.log("will-quit");

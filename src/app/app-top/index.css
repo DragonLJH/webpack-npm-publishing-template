@@ -1,0 +1,79 @@
+.app-top{
+    height: 100px;
+    box-sizing: border-box;
+}
+.app-top-title{
+    height: 50px;
+    line-height: 50px;
+    border-bottom: solid 1px #ccc;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+}
+.app-top-title > .text{
+    padding-left: 10px;
+}
+.app-top-title > .operate{
+    width: 170px;
+    display: flex;
+    gap: 10px;
+    height: 50px;
+}
+.app-top-title > .operate > div{
+    width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.app-top-title > .operate > div > span {
+    display: block;
+    width: 20px;
+    height: 20px;
+}
+.app-top-title > .operate > .min > span{
+    background: url(@/imgs/min.svg) center no-repeat;
+}
+.app-top-title > .operate > .max > span{
+    background: url(@/imgs/max.svg) center no-repeat;
+}
+.app-top-title > .operate > .max2 > span{
+    background: url(@/imgs/max2.svg) center no-repeat;
+}
+.app-top-title > .operate > .close > span{
+    background: url(@/imgs/close.svg) center no-repeat;
+}
+.app-top-main{
+    display: flex;
+    --h-w: 200px;
+    height: 50px;
+}
+.app-top-main>.app-top-main-history{
+    width: var(--h-w);
+    display: flex;
+}
+.app-top-main>.app-top-main-history>div{
+    width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.app-top-main>.app-top-main-url{
+    width: calc(100% - var(--h-w));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: solid 1px #ccc;
+    box-sizing: border-box;
+    border-radius: 15px;
+    margin: 5px 10px;
+    padding: 5px 10px;
+}
+.app-top-main>.app-top-main-url>input{
+    width: calc(100% - 20px);
+    height: 30px;
+    box-sizing: border-box;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    outline: none;
+}

@@ -42,9 +42,13 @@
 
     npm i sass --save-dev
 
-    npm i node-sass@6.0.1 --save-dev
-
-    npm i sass-loader@10.2.1 --save-dev
+    // node-sass 依赖本机node版本
+    // sass-loader 依赖node-sass版本 
+    // 参考 https://github.com/sass/node-sass
+    npm i node-sass@x.x.x sass-loader -D
+    
+    // npm i node-sass@6.0.1 --save-dev
+    // npm i sass-loader@10.2.1 --save-dev
    
     1. webpack 配置
     {
