@@ -1,55 +1,71 @@
-import "./index.scss"
-import React, { useState, useEffect } from 'react';
-import { homeViewRoutes, HomeViewComponent } from "@/route/index"
+import "./index.scss";
+import React, { useState, useEffect } from "react";
+import { homeViewRoutes, HomeViewComponent } from "@/route/index";
 import { useHistory, useLocation, useParams } from "react-router-dom";
-import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
-import { Menu } from 'antd';
-function getItem(label, key, children, icon, type) {
-    return {
-        key,
-        icon,
-        children,
-        label,
-        type,
-    };
+import DMenu from "@/components/DMenu/index";
+import { mergeObj } from "@/utils/index";
+function getItem(label, key, mate, children, icon, type) {
+  return {
+    key,
+    icon,
+    children,
+    label,
+    type,
+    mate,
+  };
 }
 
 const HomeView = () => {
-    const history = useHistory();
-    const { pathname } = useLocation();
-    const params = useParams();
-    const [collapsed, setCollapsed] = useState(false);
+  const history = useHistory();
+  const { pathname } = useLocation();
+  const params = useParams();
+  const [collapsed, setCollapsed] = useState(false);
 
-    const [routes, useRoutes] = useState(homeViewRoutes.map(({ name, path }) => {
-        return getItem(name, path)
-    }))
-    console.log(history, pathname, params)
-    console.log("HomeView", routes)
-    const menuClick = ({ key }) => {
-        history.replace(key)
-        console.log("menuClick", key)
-    };
-    return (
-        <>
-            <div className="home-view">
-                <div className="home-view-left">
-                    <Menu
-                        defaultSelectedKeys={pathname}
-                        mode="inline"
-                        onClick={menuClick}
-                        style={{
-                            width: 200,
-                        }}
-                        items={routes}
-                        inlineCollapsed={collapsed}
-                    />
-                </div>
-                <div className="home-view-main">
-                    <HomeViewComponent />
-                </div>
-            </div>
-        </>
-    )
-}
+  const [routes, setRoutes] = useState(null);
+  console.log(history, pathname, params);
+  console.log("HomeView", routes);
+  const menuClick = (data) => {
+    const { key, label, mate } = data;
+    const { winOp } = mate;
+    history.push(key);
+    window.ipcR.ipcCreatewin({
+      routeOp: winOp,
+      routeName: label,
+      routePath: key,
+    });
+    console.log("menuClick", key, label, mate);
+  };
+  useEffect(() => {
+    setRoutes(
+      homeViewRoutes.map(({ name, path, mate }) => {
+        return getItem(name, path, mate);
+      })
+    );
+  }, []);
+  return (
+    <>
+      <div className="home-view">
+        <div className="home-view-left">
+          {routes && <DMenu items={routes} onClick={menuClick} />}
+          {/* {routes && (
+            <Menu
+              defaultSelectedKeys={pathname}
+              mode="inline"
+              onClick={menuClick}
+              style={{
+                width: 200,
+              }}
+              items={routes}
+              inlineCollapsed={collapsed}
+            />
+          )} */}
+        </div>
+        <div className="home-view-main">
+          <HomeViewComponent />
+        </div>
+      </div>
+    </>
+  );
+};
 
-export default HomeView;  
+export default HomeView;

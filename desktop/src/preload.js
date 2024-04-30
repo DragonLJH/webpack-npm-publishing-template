@@ -1,22 +1,26 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("ipcR", {
-  ipcRendererT: (data) => {
-    ipcRenderer.send("ipcRenderer-t", data);
+  ipcMaximize: (routePath) => {
+    ipcRenderer.send("ipc-maximize", routePath);
   },
-  ipcMaximize: () => {
-    ipcRenderer.send("ipc-maximize");
+  ipcUnmaximize: (routePath) => {
+    ipcRenderer.send("ipc-unmaximize", routePath);
   },
-  ipcUnmaximize: () => {
-    ipcRenderer.send("ipc-unmaximize");
+  ipcMinimize: (routePath) => {
+    ipcRenderer.send("ipc-minimize", routePath);
   },
-  ipcMinimize: () => {
-    ipcRenderer.send("ipc-minimize");
+  ipcClose: (routePath) => {
+    ipcRenderer.send("ipc-close", routePath);
   },
-  ipcClose: () => {
-    ipcRenderer.send("ipc-close");
-  },
-  ipcIsMaximized: () => ipcRenderer.invoke("ipc-isMaximized"),
+  ipcIsMaximized: (routePath) =>
+    ipcRenderer.invoke("ipc-isMaximized", routePath),
+  ipcDialogOpen: (data) => ipcRenderer.invoke("ipc-dialogOpen", data),
+  ipcReadFile: (path) => ipcRenderer.invoke("ipc-readFile", path),
+  ipcAppPath: () => ipcRenderer.invoke("ipc-appPath"),
+  ipcCreatewin: ({ routeOp, routePath }) =>
+    ipcRenderer.send("ipc-createwin", { routeOp, routePath }),
+  ipcGetWin: (routePath) => ipcRenderer.invoke("ipc-getWin", routePath),
 });
 
 contextBridge.exposeInMainWorld("versions", {

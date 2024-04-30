@@ -1,7 +1,7 @@
 import "./index.scss"
 import React, { useEffect, useRef, useState } from 'react';
 import { Form, Input } from 'antd';
-import { codeCanvas } from "../../utils/index"
+import { codeCanvas } from "@/utils/index"
 
 const CodeInput = (props) => {
     const { form } = props

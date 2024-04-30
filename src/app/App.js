@@ -6,10 +6,9 @@ const App = () => {
   useEffect(() => {}, []);
   return (
     <>
-      <AppTop></AppTop>
-      <div className="app-main">
-        <MyRouter></MyRouter>
-      </div>
+      <MyRouter>
+        <AppTop></AppTop>
+      </MyRouter>
     </>
   );
 };
