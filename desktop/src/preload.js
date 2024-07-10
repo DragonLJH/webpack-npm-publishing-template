@@ -10,16 +10,20 @@ contextBridge.exposeInMainWorld("ipcR", {
   ipcMinimize: (routePath) => {
     ipcRenderer.send("ipc-minimize", routePath);
   },
-  ipcClose: (routePath) => {
-    ipcRenderer.send("ipc-close", routePath);
+  ipcClose: (winKey) => {
+    ipcRenderer.send("ipc-close", winKey);
+  },
+  ipcReload: (winKey) => {
+    ipcRenderer.send("ipc-reload", winKey);
   },
   ipcIsMaximized: (routePath) =>
     ipcRenderer.invoke("ipc-isMaximized", routePath),
   ipcDialogOpen: (data) => ipcRenderer.invoke("ipc-dialogOpen", data),
   ipcReadFile: (path) => ipcRenderer.invoke("ipc-readFile", path),
   ipcAppPath: () => ipcRenderer.invoke("ipc-appPath"),
-  ipcCreatewin: ({ routeOp, routePath }) =>
-    ipcRenderer.send("ipc-createwin", { routeOp, routePath }),
+  ipcCreatewin: ({ routeOp, routePath, winKey }) =>
+    routeOp.isCreate &&
+    ipcRenderer.send("ipc-createwin", { winKey, routeOp, routePath }),
   ipcGetWin: (routePath) => ipcRenderer.invoke("ipc-getWin", routePath),
 });
 

@@ -1,20 +1,37 @@
-import React, { useEffect, useState, useContext, useRef } from "react";
+import React, { useEffect, useState, useContext, useRef, useMemo } from "react";
 import "./index.css";
 import { useHistory, useLocation } from "react-router-dom";
+import { viewRoutes } from "@/route/index";
 const AppTop = () => {
   const l = useLocation();
   const h = useHistory();
   const operate = useRef(null);
+  const [winKey, setWinKey] = useState("Home");
   const [operateCount, setOperateCount] = useState(0);
   const [isMaximized, setIsMaximized] = useState(false);
   const [url, setUrl] = useState("");
+  const [moreButton, setMoreButton] = useState(false);
   const setIsMaximizedFn = async () => {
-    let is = await window.ipcR.ipcIsMaximized(l.pathname);
+    let is = await window.ipcR.ipcIsMaximized(winKey);
     setIsMaximized(!is);
   };
+  const openWin = (item) => {
+    let winKey = Math.random().toString().slice(2);
+    let { name, path, mate } = item;
+    const { winOp } = mate;
+    window.ipcR.ipcCreatewin({
+      winKey,
+      routeOp: winOp,
+      routeName: name,
+      routePath: `${path}?winKey=${winKey}`,
+    });
+  };
+  useEffect(() => {
+    if (l.search) setWinKey(l.search.replace("?", "").split("=")[1]);
+  }, []);
   useEffect(() => {
     setUrl(location.href);
-  }, [l.pathname]);
+  }, [winKey]);
   useEffect(() => {
     let childElementCount = operate?.current?.childElementCount;
     if (childElementCount) setOperateCount(childElementCount);
@@ -33,10 +50,30 @@ const AppTop = () => {
             }}
           >
             <div className="more-button">
-              <span onClick={() => {}}></span>
+              <span onClick={() => setMoreButton(true)}></span>
+              {moreButton && (
+                <div
+                  className="more-button-items"
+                  onMouseLeave={() => setMoreButton(false)}
+                >
+                  {viewRoutes
+                    .filter((item) => item.path !== "/HomeView")
+                    .map((item, index) => {
+                      return (
+                        <div
+                          className="more-button-items-item"
+                          key={index}
+                          onClick={() => openWin(item)}
+                        >
+                          {item.mate.label}
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
             </div>
             <div className="min">
-              <span onClick={window.ipcR.ipcMinimize}></span>
+              <span onClick={() => window.ipcR.ipcMinimize(winKey)}></span>
             </div>
             <div className={`${isMaximized ? "max" : "max2"}`}>
               <span
@@ -44,13 +81,13 @@ const AppTop = () => {
                   e.preventDefault();
                   setIsMaximizedFn();
                   isMaximized
-                    ? window.ipcR.ipcUnmaximize(l.pathname)
-                    : window.ipcR.ipcMaximize(l.pathname);
+                    ? window.ipcR.ipcUnmaximize(winKey)
+                    : window.ipcR.ipcMaximize(winKey);
                 }}
               ></span>
             </div>
             <div className="close">
-              <span onClick={() => window.ipcR.ipcClose(l.pathname)}></span>
+              <span onClick={() => window.ipcR.ipcClose(winKey)}></span>
             </div>
           </div>
         </div>
@@ -59,7 +96,10 @@ const AppTop = () => {
             <div className="home" onClick={() => h.push("/")}></div>
             <div className="left" onClick={() => h.goBack()}></div>
             <div className="right" onClick={() => h.goForward()}></div>
-            <div className="refresh" onClick={() => {}}></div>
+            <div
+              className="refresh"
+              onClick={() => window.ipcR.ipcReload(winKey)}
+            ></div>
           </div>
           <div className="app-top-main-url">
             <input type="text" value={url} disabled />

@@ -3,19 +3,23 @@ import { HashRouter as Router, Route, Redirect } from "react-router-dom";
 
 // 动态加载view根目录下的路由组件
 const requireViewRoutes = require.context("../view", true, /index.(jsx|js)$/);
-
-const viewRoutes = requireViewRoutes
+// 动态加载view根目录下的page.js信息
+const requireViewPages = require.context("../view", true, /page.(jsx|js)$/);
+export const viewRoutes = requireViewRoutes
   .keys()
   .map((item) => {
+    const pageMate = requireViewPages(
+      item.replace("index.js", "page.js")
+    ).default;
     const name = item.replace(/^\.\//, "").replace(/\/index.(jsx|js)$/, "");
     return {
       name,
       component: requireViewRoutes(item).default,
       path: `/${name}`,
+      mate: pageMate,
     };
   })
   .filter((item) => item.name.indexOf("/") == -1);
-console.log("viewRoutes:%o", viewRoutes);
 
 // 动态加载HomeView目录下的路由组件
 const requireHomeViewRoutes = require.context(
@@ -25,7 +29,7 @@ const requireHomeViewRoutes = require.context(
 );
 
 // 动态加载view根目录下的page.js信息
-const requirePages = require.context(
+const requireHomeViewPages = require.context(
   "../view/HomeView",
   true,
   /page.(jsx|js)$/
@@ -34,7 +38,9 @@ const requirePages = require.context(
 export const homeViewRoutes = requireHomeViewRoutes
   .keys()
   .map((item) => {
-    const pageMate = requirePages(item.replace("index.js", "page.js")).default;
+    const pageMate = requireHomeViewPages(
+      item.replace("index.js", "page.js")
+    ).default;
     const name = item.replace(/^\.\//, "").replace(/\/?index.(jsx|js)$/, "");
     return {
       name,

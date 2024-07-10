@@ -4,5 +4,6 @@ export default {
     title: "TimeTableViewTitle",
     width: 400,
     height: 200,
+    isCreate: false,
   },
 };

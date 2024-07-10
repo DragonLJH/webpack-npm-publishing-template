@@ -25,6 +25,7 @@
   height: 50px;
 }
 .app-top-title > .operate > div {
+  position: relative;
   width: 50px;
   display: flex;
   align-items: center;
@@ -37,6 +38,33 @@
   cursor: pointer;
 }
 
+.app-top-title > .operate > .more-button > .more-button-items {
+  position: absolute;
+  width: 100px;
+  top: 50px;
+  left: -50px;
+  box-shadow: 0px 0px 1px 1px #999;
+  background-color: #fff;
+}
+.app-top-title
+  > .operate
+  > .more-button
+  > .more-button-items
+  > .more-button-items-item {
+  text-align: center;
+  height: 40px;
+  line-height: 35px;
+  cursor: pointer;
+  background: right 100% / 100% 10% no-repeat
+    linear-gradient(to right, #ccc, #999, #ccc);
+}
+.app-top-title
+  > .operate
+  > .more-button
+  > .more-button-items
+  > .more-button-items-item:hover {
+  background-color: #eee;
+}
 .app-top-title > .operate > .more-button > span {
   background: url(@/imgs/more-button.svg) center no-repeat;
 }

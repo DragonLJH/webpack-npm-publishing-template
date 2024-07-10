@@ -11,8 +11,12 @@ const ipcFun = (win, winList) => {
   ipcMain.on("ipc-minimize", (_, routePath) => {
     winList.get(routePath).minimize();
   });
-  ipcMain.on("ipc-close", (_, routePath) => {
-    winList.get(routePath).close();
+  ipcMain.on("ipc-close", (_, winKey) => {
+    winList.get(winKey).close();
+    winList.delete(winKey);
+  });
+  ipcMain.on("ipc-reload", (_, winKey) => {
+    winList.get(winKey).reload();
   });
   ipcMain.handle("ipc-isMaximized", (_, routePath) =>
     winList.get(routePath).isMaximized()
@@ -35,11 +39,13 @@ const ipcFun = (win, winList) => {
   });
   ipcMain.handle("ipc-readFile", (_, path) => fs.readFileSync(path));
   ipcMain.handle("ipc-appPath", (_) => app.getAppPath());
-  ipcMain.on("ipc-createwin", (_, { routeOp, routePath }) => {
-    winList.set(
-      routePath,
-      createwin({ routeOp, parent: winList.get("Home") }, `${URL}#${routePath}`)
+  ipcMain.on("ipc-createwin", (_, { winKey, routeOp, routePath }) => {
+    let win = createwin(
+      { routeOp, parent: winList.get("Home") },
+      `${URL}#${routePath}`
     );
+    win.id = winKey;
+    winList.set(winKey, win);
   });
   ipcMain.handle("ipc-getWin", (_, routePath) => routePath);
 };

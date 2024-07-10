@@ -32,6 +32,7 @@ const HOME_WIN_OPTIONS = {
   show: false,
   frame: false,
   title: "Electron",
+  // alwaysOnTop: true, // 设置窗口置顶
   webPreferences: {
     nodeIntegration: true,
     webSecurity: false,

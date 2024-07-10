@@ -4,5 +4,6 @@ export default {
     title: "TimeTableViewCopyTitle",
     width: 500,
     height: 200,
+    isCreate: false,
   },
 };

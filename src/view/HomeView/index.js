@@ -25,15 +25,17 @@ const HomeView = () => {
   console.log(history, pathname, params);
   console.log("HomeView", routes);
   const menuClick = (data) => {
-    const { key, label, mate } = data;
+    let winKey = Math.random().toString().slice(2);
+    let { key, label, mate } = data;
     const { winOp } = mate;
     history.push(key);
     window.ipcR.ipcCreatewin({
+      winKey,
       routeOp: winOp,
       routeName: label,
-      routePath: key,
+      routePath: `${key}?winKey=${winKey}`,
     });
-    console.log("menuClick", key, label, mate);
+    console.log("menuClick", winKey, key, label, mate);
   };
   useEffect(() => {
     setRoutes(

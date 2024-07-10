@@ -4,5 +4,6 @@ export default {
     title: "FileDragTitle",
     width: 600,
     height: 300,
+    isCreate: true,
   },
 };

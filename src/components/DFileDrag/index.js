@@ -5,7 +5,7 @@ const DFileDrag = (props) => {
   const tRef = useRef(null);
   useEffect(() => {
     // 全局文件拖拽实现
-    let drop = document.querySelector(".file-drag-rect");
+    let drop = document.querySelector(".d-file-drag");
     drop?.addEventListener("dragover", (event) => {
       event.preventDefault();
     });
